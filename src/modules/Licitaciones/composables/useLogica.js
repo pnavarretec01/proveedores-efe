@@ -15,9 +15,9 @@ export const useLogica = (data, abrirDialog, abrirDialogEliminar) => {
   };
 
   const guardar = async () => {
-    const { id, categoria } = itemEditar.value;
+    const { id, licitacion } = itemEditar.value;
 
-    if (servicioExiste(categoria, id)) {
+    if (servicioExiste(licitacion, id)) {
       alert("Este Servicio ya existe!");
       return;
     }
@@ -33,7 +33,7 @@ export const useLogica = (data, abrirDialog, abrirDialogEliminar) => {
 
       const newItem = {
         id: nuevoId,
-        licitacion: servicio,
+        licitacion: licitacion,
       };
       data.value.unshift(newItem);
     }
