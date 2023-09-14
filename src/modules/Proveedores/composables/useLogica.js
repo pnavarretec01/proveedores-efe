@@ -2,7 +2,14 @@ import { ref } from "vue";
 
 export const useLogica = (data, abrirDialog, abrirDialogEliminar) => {
   const itemEditar = ref({
-    licitacion: "",
+    nombreProveedor: "",
+    referencia: "",
+    codSAP: "",
+    nroIdentificacion: "",
+    ps: "",
+    poblacion: "",
+    calle: "",
+    direccion: "",
   });
 
   const servicioExiste = (nombre, excludeId = null) => {
@@ -42,14 +49,28 @@ export const useLogica = (data, abrirDialog, abrirDialogEliminar) => {
   const abrirEditarItem = (item) => {
     itemEditar.value = {
       id: item.raw.id,
-      categoria: item.raw.categoria,
+      nombreProveedor: item.raw.nombreProveedor,
+      referencia: item.raw.referencia,
+      codSAP: item.raw.codSAP,
+      nroIdentificacion: item.raw.nroIdentificacion,
+      ps: item.raw.ps,
+      poblacion: item.raw.poblacion,
+      calle: item.raw.calle,
+      direccion: item.raw.direccion,
     };
     abrirDialog.value = true;
   };
 
   const crearServicio = () => {
     itemEditar.value = {
-      categoria: "",
+      nombreProveedor: "",
+      referencia: "",
+      codSAP: "",
+      nroIdentificacion: "",
+      ps: "",
+      poblacion: "",
+      calle: "",
+      direccion: "",
     };
     abrirDialog.value = true;
   };

@@ -6,6 +6,7 @@ export default [
   },
   {
     title: "Proveedores",
+    to: { name: "proveedores-page" },
     icon: { icon: "tabler-checkbox" },
   },
   {
