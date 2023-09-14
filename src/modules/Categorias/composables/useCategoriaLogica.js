@@ -1,6 +1,6 @@
 import { ref } from "vue";
 
-export const useCategoriaLogica = (data, abrirDialog) => {
+export const useCategoriaLogica = (data, abrirDialog, abrirDialogEliminar) => {
   const categoriaEditar = ref({
     categoria: "",
   });
@@ -58,10 +58,22 @@ export const useCategoriaLogica = (data, abrirDialog) => {
     abrirDialog.value = false;
     categoriaEditar.value = {};
   };
+  const closeDelete = () => {
+    abrirDialogEliminar.value = false;
+    categoriaEditar.value = {};
+  };
 
-  const deleteItem = (itemId) => {
-    const index = data.value.findIndex((item) => item.id === itemId);
+  const abrirEliminarCategoria = (item) => {
+    categoriaEditar.value = {
+      id: item,
+    };
+    abrirDialogEliminar.value = true;
+  };
+
+  const confirmarEliminarCategoria = (itemId) => {
+    const index = data.value.findIndex((item) => item.id === itemId.id);
     data.value.splice(index, 1);
+    closeDelete();
   };
 
   return {
@@ -70,6 +82,8 @@ export const useCategoriaLogica = (data, abrirDialog) => {
     abrirEditarCategoria,
     crearCategoria,
     close,
-    deleteItem,
+    confirmarEliminarCategoria,
+    closeDelete,
+    abrirEliminarCategoria,
   };
 };

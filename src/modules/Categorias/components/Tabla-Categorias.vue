@@ -4,10 +4,12 @@ import axios from '@axios'
 import { useCategorias } from '../composables/useCategorias';
 import { useCategoriaLogica } from '../composables/useCategoriaLogica';
 import categoriasDialog from './Dialog-Agregar-Categorias.vue'
+import categoriasDialogEliminar from './Dialog-Eliminar.vue'
 
 const search = ref('')
 const productList = ref([])
 const abrirDialog = ref(false);
+const abrirDialogEliminar = ref(false);
 
 const { data } = useCategorias();
 const {
@@ -16,8 +18,11 @@ const {
   abrirEditarCategoria,
   crearCategoria,
   close,
-  deleteItem
-} = useCategoriaLogica(data, abrirDialog);
+  deleteItem,
+  confirmarEliminarCategoria,
+  closeDelete,
+  abrirEliminarCategoria
+} = useCategoriaLogica(data, abrirDialog, abrirDialogEliminar);
 
 const headers = [
   {
@@ -77,7 +82,7 @@ watch(options, newVal => {
         <IconBtn>
           <VIcon icon="tabler-edit" @click="abrirEditarCategoria(item)" />
         </IconBtn>
-        <IconBtn @click="deleteItem(item.value)">
+        <IconBtn @click="abrirEliminarCategoria(item.value)">
           <VIcon icon="tabler-trash" />
         </IconBtn>
       </template>
@@ -101,5 +106,7 @@ watch(options, newVal => {
       </template>
     </VDataTable>
     <categoriasDialog :item="categoriaEditar" :dialog="abrirDialog" @close="close" @guardarCategoria="guardar" />
+    <categoriasDialogEliminar :item="categoriaEditar" :dialog="abrirDialogEliminar" @close="closeDelete"
+      @confirmarEliminar="confirmarEliminarCategoria" />
   </div>
 </template>
