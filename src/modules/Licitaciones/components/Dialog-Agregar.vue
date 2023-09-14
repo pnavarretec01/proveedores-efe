@@ -12,7 +12,6 @@ const props = defineProps({
     required: true
   },
 });
-
 const localDialog = ref(props.dialog);
 
 watch(() => props.dialog, newVal => {
@@ -29,35 +28,28 @@ const close = () => {
   emit('close');
 };
 
-const save = () => {
-  emit('save', props.item);
+const guardar = () => {
+  emit('guardarItem', props.item);
 };
-
 </script>
 
 <template>
-  <VDialog v-model="localDialog" max-width="600px" @click:outside="close">
+  <VDialog v-model="localDialog" width="500" @click:outside="close">
     <DialogCloseBtn @click="close" />
-    <VCard>
-      <VCardTitle>
-        <span class="headline">{{ item && item.pk_item_id ? 'Editar Item' : 'Nuevo Item' }}</span>
-      </VCardTitle>
+
+    <VCard :title="item && item.id ? 'Editar Servicio' : 'Crear Servicio'">
       <VCardText>
-        <VContainer>
-          <VRow>
-            <VCol cols="12" sm="6" md="8">
-              <VTextField v-model="item.nombre" label="Nombre" />
-            </VCol>
-            <VCol cols="12" sm="6" md="4">
-              <VTextField v-model="item.orden" label="Orden" />
-            </VCol>
-          </VRow>
-        </VContainer>
+        <VRow>
+          <VCol cols="12" sm="12" md="12">
+            <VTextField v-model="item.servicio" label="Servicio" />
+          </VCol>
+        </VRow>
       </VCardText>
+
       <VCardActions>
         <VSpacer />
         <VBtn color="error" variant="outlined" @click="close">Cancelar</VBtn>
-        <VBtn color="success" variant="elevated" @click="save">{{ item && item.pk_item_id ? 'Editar' : 'Guardar' }}</VBtn>
+        <VBtn color="success" variant="elevated" @click="guardar">Guardar</VBtn>
       </VCardActions>
     </VCard>
   </VDialog>

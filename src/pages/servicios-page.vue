@@ -1,10 +1,10 @@
 <script setup>
-import Tabla from '@/modules/Configuracion-Items/components/Tabla-Items.vue'
+import Tabla from '@/modules/Servicios/components/Tabla-Servicios.vue'
 </script>
 
 <template>
   <div>
-    <VCard title="Items">
+    <VCard title="Servicios">
       <VCardText>
         <Tabla />
       </VCardText>

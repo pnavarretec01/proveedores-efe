@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watchEffect, watch  } from 'vue';
+import { ref, watch  } from 'vue';
 
 const emit = defineEmits();
 
@@ -25,7 +25,7 @@ const close = () => {
 };
 
 const confirm = () => {
-  emit('confirmDelete', props.item);
+  emit('confirmarEliminar', props.item);
 };
 
 </script>
@@ -34,7 +34,7 @@ const confirm = () => {
     <DialogCloseBtn @click="close" />
     <VCard>
       <VCardTitle>
-        ¿Estás seguro que deseas eliminar este Item?
+        ¿Estás seguro que deseas eliminar este Servicio?
       </VCardTitle>
       <VCardActions>
         <VSpacer />
