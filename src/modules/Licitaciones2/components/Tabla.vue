@@ -2,7 +2,6 @@
 import { VDataTableServer } from 'vuetify/labs/VDataTable'
 import { useApis } from '../composables/useApis';
 import { useLogica } from '../composables/useLogica';
-import { useLicitacionesProveedores } from '../composables/useLicitacionesProveedores';
 import serviciosDialog from './Dialog-Agregar.vue'
 import serviciosDialogEliminar from './Dialog-Eliminar.vue'
 import { onMounted } from 'vue';
@@ -18,7 +17,7 @@ const snackbarColor = ref("succes");
 const snackbarMessage = ref("");
 
 const filters = ref({
-  NombreProveedor: '',
+  Licitacion: '',
   Referencia: '',
   CodSap: '',
   NroIdentificacion: '',
@@ -26,9 +25,6 @@ const filters = ref({
   Calle: '',
   Direccion: '',
 });
-
-const { fetchLicitaciones,
-  licitaciones } = useLicitacionesProveedores(snackbar, snackbarColor, snackbarMessage)
 
 const { data, totalItems, fetchItems, createItem, deleteItemApi, editItem } = useApis(snackbar, snackbarColor, snackbarMessage);
 
@@ -47,28 +43,12 @@ const {
 
 const headers = [
   {
-    title: '',
-    key: 'data-table-expand',
-  },
-  {
     title: 'ID',
-    key: 'ProveedorID',
+    key: 'LicitacionID',
   },
   {
-    title: 'Nombre Proveedor',
-    key: 'NombreProveedor',
-  },
-  {
-    title: 'Referencia',
-    key: 'Referencia',
-  },
-  {
-    title: 'Cod SAP',
-    key: 'CodSap',
-  },
-  {
-    title: 'Nro_identificacion',
-    key: 'NroIdentificacion',
+    title: 'Licitación',
+    key: 'Licitacion',
   },
   {
     title: 'Acciones',
@@ -80,7 +60,7 @@ const headers = [
 const options = ref({
   page: 1,
   itemsPerPage: 5,
-  sortBy: ['ProveedorID'],
+  sortBy: ['LicitacionID'],
   sortDesc: [true],
 });
 watch(options, newVal => {
@@ -100,13 +80,7 @@ function fetchWithFilters() {
 
 function clearFilters() {
   filters.value = {
-    NombreProveedor: '',
-    Referencia: '',
-    CodSap: '',
-    NroIdentificacion: '',
-    Poblacion: '',
-    Calle: '',
-    Direccion: '',
+    Licitacion: '',
   };
 }
 function loadItems(newOptions) {
@@ -123,7 +97,7 @@ function loadItems(newOptions) {
   <div>
     <div class="me-3 d-flex gap-3 mb-4 mt-1">
       <VBtn prepend-icon="tabler-plus" @click="crearServicio">
-        Crear Nuevo Proveedor
+        Crear Nueva Licitación
       </VBtn>
     </div>
     <!-- <VCardText>
@@ -135,51 +109,19 @@ function loadItems(newOptions) {
       </VRow>
     </VCardText> -->
     <VRow>
-      <VCol cols="12" sm="6" md="2">
-        <AppTextField v-model="filters.NombreProveedor" label="Nombre Proveedor" outlined />
+      <VCol cols="12" sm="6" offset-md="8" md="4">
+        <AppTextField v-model="filters.Licitacion" label="Buscar Licitación" single-line hide-details dense
+          append-inner-icon="tabler-search" />
       </VCol>
-      <VCol cols="12" sm="6" md="2">
-        <AppTextField v-model="filters.Referencia" label="Referencia" outlined />
-      </VCol>
-      <VCol cols="12" sm="6" md="2">
-        <AppTextField v-model="filters.CodSap" label="Cod Sap" outlined />
-      </VCol>
-      <VCol cols="12" sm="6" md="2">
-        <AppTextField v-model="filters.NroIdentificacion" label="Nro Identificación" outlined />
-      </VCol>
-      <VCol cols="12" sm="6" md="2">
-        <AppTextField v-model="filters.Poblacion" label="Poblacion" outlined />
-      </VCol>
-      <VCol cols="12" sm="6" md="2">
-        <AppTextField v-model="filters.Calle" label="Calle" outlined />
-      </VCol>
-      <VCol cols="12" sm="6" md="2">
-        <AppTextField v-model="filters.Direccion" label="Direccion" outlined />
-      </VCol>
-      <VCol cols="12" sm="6" md="2" class="d-flex flex-column justify-space-between">
+      <!-- <VCol cols="12" sm="6" md="2" class="d-flex flex-column justify-space-between">
         <VBtn class="mb-1" @click="fetchWithFilters">Buscar</VBtn>
         <VBtn @click="clearFilters">Limpiar</VBtn>
-      </VCol>
+      </VCol> -->
     </VRow>
 
 
     <VDataTableServer class="text-no-wrap" :headers="headers" :items="data" :items-length="totalItems" :loading="loading"
-      @update:options="loadItems" :search="search" hover sticky expand-on-click>
-      <template #expanded-row="slotProps">
-        <tr class="v-data-table__tr">
-          <td :colspan="headers.length">
-            <p class="my-1">
-              Población: {{ slotProps.item.raw.Poblacion }}
-            </p>
-            <p class="my-1">
-              Calle: {{ slotProps.item.raw.Calle }}
-            </p>
-            <p class="my-1">
-              Dirección: {{ slotProps.item.raw.Direccion }}
-            </p>
-          </td>
-        </tr>
-      </template>
+      @update:options="loadItems" :search="search" hover sticky>
       <template v-slot:item.actions="{ item }">
         <IconBtn>
           <VIcon icon="tabler-edit" @click="abrirEditarItem(item)" />
@@ -193,8 +135,7 @@ function loadItems(newOptions) {
       </template>
       <!-- <template #bottom></template> -->
     </VDataTableServer>
-    <serviciosDialog :item="itemEditar" :licitaciones="licitaciones" :dialog="abrirDialog" @close="close"
-      @guardarItem="guardar" />
+    <serviciosDialog :item="itemEditar" :dialog="abrirDialog" @close="close" @guardarItem="guardar" />
     <serviciosDialogEliminar :item="itemEditar" :dialog="abrirDialogEliminar" @closeDelete="closeDelete"
       @confirmarEliminar="confirmarEliminar" />
     <VSnackbar v-model="snackbar" :color="snackbarColor" location="top end" :timeout="2000">

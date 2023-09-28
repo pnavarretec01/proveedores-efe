@@ -1,5 +1,5 @@
 <script setup>
-import Tabla from '@/modules/Licitaciones/components/Tabla.vue'
+import Tabla from '@/modules/Licitaciones2/components/Tabla.vue'
 </script>
 
 <template>

@@ -34,7 +34,7 @@ const confirm = () => {
     <DialogCloseBtn @click="close" />
     <VCard>
       <VCardTitle>
-        ¿Estás seguro que deseas eliminar esta Licitación?
+        ¿Estás seguro que deseas eliminar este Proveedor?
       </VCardTitle>
       <VCardActions>
         <VSpacer />

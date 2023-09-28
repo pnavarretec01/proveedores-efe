@@ -32,17 +32,17 @@ const guardar = () => {
   emit('guardarItem', props.item);
 };
 </script>
-
 <template>
   <VDialog v-model="localDialog" width="500" @click:outside="close">
     <DialogCloseBtn @click="close" />
 
-    <VCard :title="item && item.id ? 'Editar Servicio' : 'Crear Servicio'">
+    <VCard :title="item && item.LicitacionID ? 'Editar Licitación' : 'Crear Licitación'">
       <VCardText>
         <VRow>
           <VCol cols="12" sm="12" md="12">
-            <VTextField v-model="item.servicio" label="Servicio" />
+            <VTextField v-model="item.Licitacion" label="Licitación" />
           </VCol>
+
         </VRow>
       </VCardText>
 

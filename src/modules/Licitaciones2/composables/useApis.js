@@ -5,12 +5,11 @@ const apiBaseURL = import.meta.env.VITE_API_URL;
 
 export function useApis(snackbar, snackbarColor, snackbarMessage) {
   const data = ref([]);
-  const licitaciones = ref([])
   const totalItems = ref(0);
 
   const fetchItems = async (filters = {}, page = 1, itemsPerPage = 10) => {
     try {
-      const response = await axios.get(apiBaseURL + "proveedores/filters", {
+      const response = await axios.get(apiBaseURL + "licitaciones/filters", {
         params: {
           ...filters,
           page,
@@ -36,14 +35,8 @@ export function useApis(snackbar, snackbarColor, snackbarMessage) {
 
   const createItem = async (item) => {
     try {
-      const response = await axios.post(apiBaseURL + "proveedores", {
-        NombreProveedor: item.NombreProveedor,
-        Referencia: item.Referencia,
-        CodSap: item.CodSap,
-        NroIdentificacion: item.NroIdentificacion,
-        Poblacion: item.Poblacion,
-        Calle: item.Calle,
-        Direccion: item.Direccion,
+      const response = await axios.post(apiBaseURL + "licitaciones", {
+        Licitacion: item.Licitacion
       });
       data.value.unshift(response.data.data);
       snackbarMessage.value = "Elemento creado con éxito";
@@ -61,7 +54,7 @@ export function useApis(snackbar, snackbarColor, snackbarMessage) {
   const editItem = async (item) => {
     try {
       const response = await axios.put(
-        apiBaseURL + "proveedores/" + item.ProveedorID,
+        apiBaseURL + "licitaciones/" + item.LicitacionID,
         item
       );
       snackbarMessage.value = "Elemento editado con éxito";
@@ -78,7 +71,7 @@ export function useApis(snackbar, snackbarColor, snackbarMessage) {
 
   const deleteItemApi = async (id) => {
     try {
-      await axios.delete(apiBaseURL + "proveedores/" + id);
+      await axios.delete(apiBaseURL + "licitaciones/" + id);
       snackbarMessage.value = "Elemento eliminado con éxito";
       snackbarColor.value = "success";
       snackbar.value = true;
