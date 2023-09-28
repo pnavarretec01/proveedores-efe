@@ -32,37 +32,33 @@ const guardar = () => {
   emit('guardarItem', props.item);
 };
 </script>
-
 <template>
   <VDialog v-model="localDialog" width="500" @click:outside="close">
     <DialogCloseBtn @click="close" />
 
-    <VCard :title="item && item.id ? 'Editar Proveedor' : 'Crear Proveedor'">
+    <VCard :title="item && item.ProveedorID ? 'Editar Proveedor' : 'Crear Proveedor'">
       <VCardText>
         <VRow>
           <VCol cols="12" sm="12" md="12">
-            <VTextField v-model="item.nombreProveedor" label="Nombre Proveedor" />
+            <VTextField v-model="item.NombreProveedor" label="Nombre Proveedor" />
           </VCol>
           <VCol cols="12" sm="6" md="6">
-            <VTextField v-model="item.referencia" label="Referencia" />
+            <VTextField v-model="item.Referencia" label="Referencia" />
           </VCol>
           <VCol cols="12" sm="6" md="6">
-            <VTextField v-model="item.codSAP" label="Código SAP" />
+            <VTextField v-model="item.CodSap" label="Código SAP" />
           </VCol>
           <VCol cols="12" sm="6" md="6">
-            <VTextField v-model="item.nroIdentificacion" label="N° Identificación" />
+            <VTextField v-model="item.NroIdentificacion" label="N° Identificación" />
           </VCol>
           <VCol cols="12" sm="6" md="6">
-            <VTextField v-model="item.ps" label="PS" />
-          </VCol>
-          <VCol cols="12" sm="6" md="6">
-            <VTextField v-model="item.poblacion" label="Población" />
+            <VTextField v-model="item.Poblacion" label="Población" />
           </VCol>
           <VCol cols="12" sm="12" md="12">
-            <VTextField v-model="item.calle" label="Calle" />
+            <VTextField v-model="item.Calle" label="Calle" />
           </VCol>
           <VCol cols="12" sm="6" md="6">
-            <VTextField v-model="item.direccion" label="Dirección" />
+            <VTextField v-model="item.Direccion" label="Dirección" />
           </VCol>
         </VRow>
       </VCardText>
