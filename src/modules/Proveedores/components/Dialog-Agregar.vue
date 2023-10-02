@@ -18,6 +18,10 @@ const props = defineProps({
 });
 const localDialog = ref(props.dialog);
 
+const actualizarLicitaciones = (values) => {
+  licitacionesSeleccionadas.value = values
+}
+
 watch(() => props.dialog, newVal => {
   localDialog.value = newVal;
 });
@@ -33,13 +37,29 @@ const close = () => {
 };
 
 const guardar = () => {
-  emit('guardarItem', props.item);
+  const datos = {
+    proveedor: {
+      NombreProveedor: props.item.proveedor.NombreProveedor,
+      Referencia: props.item.proveedor.Referencia,
+      CodSap: props.item.proveedor.CodSap,
+      NroIdentificacion: props.item.proveedor.NroIdentificacion,
+      Poblacion: props.item.proveedor.Poblacion,
+      Calle: props.item.proveedor.Calle,
+      Direccion: props.item.proveedor.Direccion,
+    },
+    licitaciones: licitacionesSeleccionadas.value,
+    contactos: contactos.value
+  };
+  console.log(datos);
+  emit('guardarItem', datos);
 };
+
 const currentTab = ref(0)
 
-const contactos = ref(props.item.Contactos ? props.item.Contactos : [{ NombreContacto: "", Email: "", Telefono: "" }]);
+const contactos = ref(props.item.contactos ? props.item.contactos : [{ NombreContacto: "", Email: "", Telefono: "" }]);
+const licitacionesSeleccionadas = ref(props.item.licitaciones ? props.item.licitaciones : []);
 
-watch(() => props.item.Contactos, newVal => {
+watch(() => props.item.contactos, newVal => {
   if (newVal && newVal.length) {
     contactos.value = newVal;
   } else {
@@ -59,45 +79,43 @@ const eliminarContacto = (index) => {
 <template>
   <VDialog v-model="localDialog" width="720" @click:outside="close">
     <DialogCloseBtn @click="close" />
-
-    <VCard :title="item && item.ProveedorID ? 'Editar Proveedor' : 'Crear Proveedor'">
-
+    <VCard :title="item.proveedor ? 'Editar Proveedor' : 'Crear Proveedor'">
       <VTabs v-model="currentTab">
         <VTab>Proveedor</VTab>
         <VTab>Licitaciónes</VTab>
         <VTab>Contactos</VTab>
       </VTabs>
-
       <VCardText>
         <VWindow v-model="currentTab">
           <VWindowItem key="0">
             <VRow class="mt-1">
               <VCol cols="12" sm="12" md="12">
-                <VTextField v-model="item.NombreProveedor" label="Nombre Proveedor" />
+                <VTextField v-model="item.proveedor.NombreProveedor" label="Nombre Proveedor" />
               </VCol>
               <VCol cols="12" sm="6" md="6">
-                <VTextField v-model="item.Referencia" label="Referencia" />
+                <VTextField v-model="item.proveedor.Referencia" label="Referencia" />
               </VCol>
               <VCol cols="12" sm="6" md="6">
-                <VTextField v-model="item.CodSap" label="Código SAP" />
+                <VTextField v-model="item.proveedor.CodSap" label="Código SAP" />
               </VCol>
               <VCol cols="12" sm="6" md="6">
-                <VTextField v-model="item.NroIdentificacion" label="N° Identificación" />
+                <VTextField v-model="item.proveedor.NroIdentificacion" label="N° Identificación" />
               </VCol>
               <VCol cols="12" sm="6" md="6">
-                <VTextField v-model="item.Poblacion" label="Población" />
+                <VTextField v-model="item.proveedor.Poblacion" label="Población" />
               </VCol>
               <VCol cols="12" sm="12" md="12">
-                <VTextField v-model="item.Calle" label="Calle" />
+                <VTextField v-model="item.proveedor.Calle" label="Calle" />
               </VCol>
               <VCol cols="12" sm="6" md="6">
-                <VTextField v-model="item.Direccion" label="Dirección" />
+                <VTextField v-model="item.proveedor.Direccion" label="Dirección" />
               </VCol>
             </VRow>
           </VWindowItem>
           <VWindowItem key="1">
             <AppAutocomplete small-chips item-title="Licitacion" :items="licitaciones"
-              placeholder="Seleccionar Licitación" chips closable-chips multiple eager return-object>
+              placeholder="Seleccionar Licitación" chips closable-chips multiple eager return-object
+              @update:modelValue="actualizarLicitaciones">
               <template v-slot:no-data>
                 <div class="px-4">No existen datos</div>
               </template>

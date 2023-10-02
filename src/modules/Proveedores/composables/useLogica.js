@@ -11,15 +11,18 @@ export const useLogica = (
   deleteItemApi,
   editItem
 ) => {
-  const itemEditar = ref({
-    NombreProveedor: "",
-    Referencia: "",
-    CodSap: "",
-    NroIdentificacion: "",
-    Poblacion: "",
-    Calle: "",
-    Direccion: "",
-    Contactos: []
+  const datosEditar = ref({
+    proveedor: {
+      NombreProveedor: "",
+      Referencia: "",
+      CodSap: "",
+      NroIdentificacion: "",
+      Poblacion: "",
+      Calle: "",
+      Direccion: "",
+    },
+    licitaciones: [],
+    contactos: [],
   });
 
   const servicioExiste = (nombre, excludeId = null) => {
@@ -32,16 +35,27 @@ export const useLogica = (
   };
 
   const guardar = async () => {
-    const { ProveedorID, NombreProveedor } = itemEditar.value;
+    console.log("guardar", datosEditar.value);
+
+    const { proveedor, licitaciones, contactos } = datosEditar.value;
+    const { ProveedorID, NombreProveedor } = proveedor;
+    return;
 
     if (servicioExiste(NombreProveedor, ProveedorID)) {
       alert("Este Proveedor ya existe!");
       return;
     }
 
+    const proveedorCompleto = {
+      ...proveedor,
+      licitaciones: licitaciones,
+      contactos: contactos,
+    };
+
     try {
       if (ProveedorID) {
-        await editItem(itemEditar.value);
+        return;
+        await editItem(proveedorCompleto);
         //await editar
         const index = data.value.findIndex(
           (item) => item.ProveedorID === ProveedorID
@@ -50,18 +64,7 @@ export const useLogica = (
           data.value[index] = { ...itemEditar.value };
         }
       } else {
-        const item = {
-          ProveedorID: itemEditar.value.ProveedorID,
-          NombreProveedor: itemEditar.value.NombreProveedor,
-          Referencia: itemEditar.value.Referencia,
-          CodSap: itemEditar.value.CodSap,
-          NroIdentificacion: itemEditar.value.NroIdentificacion,
-          Poblacion: itemEditar.value.Poblacion,
-          Calle: itemEditar.value.Calle,
-          Direccion: itemEditar.value.Direccion,
-          Contactos: itemEditar.value.Contactos,
-        };
-        await createItem(item);
+        await createItem(datosEditar.value);
       }
       close();
     } catch (error) {
@@ -70,46 +73,75 @@ export const useLogica = (
   };
 
   const abrirEditarItem = (item) => {
-    console.log(item.raw.Contactos);
-    itemEditar.value = {
-      ProveedorID: item.raw.ProveedorID,
-      NombreProveedor: item.raw.NombreProveedor,
-      Referencia: item.raw.Referencia,
-      CodSap: item.raw.CodSap,
-      NroIdentificacion: item.raw.NroIdentificacion,
-      Poblacion: item.raw.Poblacion,
-      Calle: item.raw.Calle,
-      Direccion: item.raw.Direccion,
-      Contactos: item.raw.Contactos,
+    datosEditar.value = {
+      proveedor: {
+        NombreProveedor: item.raw.NombreProveedor,
+        Referencia: item.raw.Referencia,
+        CodSap: item.raw.CodSap,
+        NroIdentificacion: item.raw.NroIdentificacion,
+        Poblacion: item.raw.Poblacion,
+        Calle: item.raw.Calle,
+        Direccion: item.raw.Direccion,
+      },
+      licitaciones: item.raw.Licitaciones || [],
+      contactos: item.raw.Contactos || [],
     };
     abrirDialog.value = true;
   };
 
   const crearServicio = () => {
-    itemEditar.value = {
-      NombreProveedor: "",
-      Referencia: "",
-      CodSap: "",
-      NroIdentificacion: "",
-      Poblacion: "",
-      Calle: "",
-      Direccion: "",
+    datosEditar.value = {
+      proveedor: {
+        NombreProveedor: "",
+        Referencia: "",
+        CodSap: "",
+        NroIdentificacion: "",
+        Poblacion: "",
+        Calle: "",
+        Direccion: "",
+      },
+      licitaciones: [],
+      contactos: [],
     };
     abrirDialog.value = true;
   };
 
   const close = () => {
     abrirDialog.value = false;
-    itemEditar.value = {};
+    datosEditar.value = {
+      proveedor: {
+        NombreProveedor: "",
+        Referencia: "",
+        CodSap: "",
+        NroIdentificacion: "",
+        Poblacion: "",
+        Calle: "",
+        Direccion: "",
+      },
+      licitaciones: [],
+      contactos: [],
+    };
   };
   const closeDelete = () => {
     abrirDialogEliminar.value = false;
-    itemEditar.value = {};
+    datosEditar.value = {
+      proveedor: {
+        NombreProveedor: "",
+        Referencia: "",
+        CodSap: "",
+        NroIdentificacion: "",
+        Poblacion: "",
+        Calle: "",
+        Direccion: "",
+      },
+      licitaciones: [],
+      contactos: [],
+    };
   };
 
   const abrirEliminarItem = (item) => {
-    itemEditar.value = {
-      ProveedorID: item,
+    datosEditar.value = {
+      ProveedorID: item.ProveedorID,
     };
     abrirDialogEliminar.value = true;
   };
@@ -130,7 +162,7 @@ export const useLogica = (
   };
 
   return {
-    itemEditar,
+    datosEditar,
     guardar,
     abrirEditarItem,
     crearServicio,

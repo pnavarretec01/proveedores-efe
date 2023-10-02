@@ -34,7 +34,7 @@ const { data, totalItems, fetchItems, createItem, deleteItemApi, editItem } = us
 
 onMounted(() => fetchItems(filters.value, options.value.page, options.value.itemsPerPage));
 const {
-  itemEditar,
+  datosEditar,
   guardar,
   abrirEditarItem,
   crearServicio,
@@ -126,14 +126,6 @@ function loadItems(newOptions) {
         Crear Nuevo Proveedor
       </VBtn>
     </div>
-    <!-- <VCardText>
-      <VRow>
-        <VCol cols="12" offset-md="8" md="4">
-          <AppTextField v-model="search" density="compact" placeholder="Buscar" append-inner-icon="tabler-search"
-            single-line hide-details dense outlined />
-        </VCol>
-      </VRow>
-    </VCardText> -->
     <VRow>
       <VCol cols="12" sm="6" md="2">
         <AppTextField v-model="filters.NombreProveedor" label="Nombre Proveedor" outlined />
@@ -161,8 +153,6 @@ function loadItems(newOptions) {
         <VBtn @click="clearFilters">Limpiar</VBtn>
       </VCol>
     </VRow>
-
-
     <VDataTableServer class="text-no-wrap" :headers="headers" :items="data" :items-length="totalItems" :loading="loading"
       @update:options="loadItems" :search="search" hover sticky expand-on-click>
       <template #expanded-row="slotProps">
@@ -193,9 +183,9 @@ function loadItems(newOptions) {
       </template>
       <!-- <template #bottom></template> -->
     </VDataTableServer>
-    <serviciosDialog :item="itemEditar" :licitaciones="licitaciones" :dialog="abrirDialog" @close="close"
+    <serviciosDialog :item="datosEditar" :licitaciones="licitaciones" :dialog="abrirDialog" @close="close"
       @guardarItem="guardar" />
-    <serviciosDialogEliminar :item="itemEditar" :dialog="abrirDialogEliminar" @closeDelete="closeDelete"
+    <serviciosDialogEliminar :item="datosEditar" :dialog="abrirDialogEliminar" @closeDelete="closeDelete"
       @confirmarEliminar="confirmarEliminar" />
     <VSnackbar v-model="snackbar" :color="snackbarColor" location="top end" :timeout="2000">
       {{ snackbarMessage }}

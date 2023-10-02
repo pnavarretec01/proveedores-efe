@@ -35,6 +35,8 @@ export function useApis(snackbar, snackbarColor, snackbarMessage) {
   };
 
   const createItem = async (item) => {
+    console.log(item);
+    return
     try {
       const response = await axios.post(apiBaseURL + "proveedores", {
         NombreProveedor: item.NombreProveedor,
