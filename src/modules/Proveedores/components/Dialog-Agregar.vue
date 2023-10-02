@@ -104,22 +104,24 @@ const eliminarContacto = (index) => {
             </AppAutocomplete>
           </VWindowItem>
           <VWindowItem key="2">
-            <VRow class="mt-1" v-for="(contacto, index) in contactos" :key="index">
-              <VCol cols="4">
-                <VTextField v-model="contacto.NombreContacto" label="Nombre Contacto" />
-              </VCol>
-              <VCol cols="3">
-                <VTextField v-model="contacto.Email" label="Email" />
-              </VCol>
-              <VCol cols="3">
-                <VTextField v-model="contacto.Telefono" label="Teléfono" />
-              </VCol>
-              <VCol cols="2">
-                <VBtn small icon color="error" @click="eliminarContacto(index)">
-                  <VIcon>mdi-delete</VIcon>
-                </VBtn>
-              </VCol>
-            </VRow>
+            <VContainer style="max-height: 400px; overflow-y: auto;">
+              <VRow class="mt-1" v-for="(contacto, index) in contactos" :key="index">
+                <VCol cols="12" sm="4" md="4">
+                  <VTextField v-model="contacto.NombreContacto" label="Nombre Contacto" />
+                </VCol>
+                <VCol cols="12" sm="4" md="3">
+                  <VTextField v-model="contacto.Email" label="Email" />
+                </VCol>
+                <VCol cols="12" sm="4" md="3">
+                  <VTextField v-model="contacto.Telefono" label="Teléfono" />
+                </VCol>
+                <VCol cols="12" sm="12" md="2">
+                  <VBtn small icon color="error" @click="eliminarContacto(index)">
+                    <VIcon>mdi-delete</VIcon>
+                  </VBtn>
+                </VCol>
+              </VRow>
+            </VContainer>
             <VRow>
               <VCol>
                 <VBtn @click="agregarContacto">Agregar Contacto</VBtn>
