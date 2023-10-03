@@ -3,6 +3,7 @@ import { VDataTableServer } from 'vuetify/labs/VDataTable'
 import { useApis } from '../composables/useApis';
 import { useLogica } from '../composables/useLogica';
 import { useLicitacionesProveedores } from '../composables/useLicitacionesProveedores';
+import { useCategorias } from '../composables/useCategorias';
 import serviciosDialog from './Dialog-Agregar.vue'
 import serviciosDialogEliminar from './Dialog-Eliminar.vue'
 import { onMounted } from 'vue';
@@ -29,6 +30,8 @@ const filters = ref({
 
 const { fetchLicitaciones,
   licitaciones } = useLicitacionesProveedores(snackbar, snackbarColor, snackbarMessage)
+const { fetchCategorias,
+  categorias } = useCategorias(snackbar, snackbarColor, snackbarMessage)
 
 const { data, totalItems, fetchItems, createItem, deleteItemApi, editItem } = useApis(snackbar, snackbarColor, snackbarMessage);
 
@@ -183,7 +186,7 @@ function loadItems(newOptions) {
       </template>
       <!-- <template #bottom></template> -->
     </VDataTableServer>
-    <serviciosDialog :item="datosEditar" :licitacionesCargadas="licitaciones" :dialog="abrirDialog" @close="close"
+    <serviciosDialog :item="datosEditar" :licitacionesCargadas="licitaciones" :categoriasCargadas="categorias" :dialog="abrirDialog" @close="close"
       @guardarItem="guardarItem(datosEditar)" />
     <serviciosDialogEliminar :item="datosEditar" :dialog="abrirDialogEliminar" @closeDelete="closeDelete"
       @confirmarEliminar="confirmarEliminar" />

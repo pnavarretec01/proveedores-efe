@@ -24,6 +24,7 @@ export const useLogica = (
     },
     licitaciones: [],
     contactos: [],
+    categoriasProveedor: [],
   });
 
   const servicioExiste = (nombre, excludeId = null) => {
@@ -87,6 +88,7 @@ export const useLogica = (
       },
       licitaciones: item.raw.Licitaciones || [],
       contactos: item.raw.Contactos || [],
+      categoriasProveedor: item.raw.CategoriasProveedor || [],
     };
     abrirDialog.value = true;
   };

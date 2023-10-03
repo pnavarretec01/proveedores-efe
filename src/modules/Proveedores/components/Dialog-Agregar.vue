@@ -12,6 +12,10 @@ const props = defineProps({
     type: Object,
     required: true
   },
+  categoriasCargadas: {
+    type: Object,
+    required: true
+  },
   dialog: {
     type: Boolean,
     required: true
@@ -20,6 +24,15 @@ const props = defineProps({
 const localDialog = ref(props.dialog);
 
 const internalLicitaciones = ref([...(props.item.licitaciones || [])]);
+const internalCategorias = ref([...(props.item.categoriasProveedor ? props.item.categoriasProveedor.map(cat => cat.Categoria) : [])]);
+watch(() => props.item.categoriasProveedor, newVal => {
+  if (newVal && newVal.length) {
+    internalCategorias.value = [...newVal.map(cat => cat.Categoria)];
+  } else {
+    internalCategorias.value = [];
+  }
+}, { immediate: true });
+
 watch(() => props.item.licitaciones, newVal => {
   if (newVal && newVal.length) {
     internalLicitaciones.value = [...newVal];
@@ -32,11 +45,10 @@ const licitacionesSeleccionadas = computed({
   get: () => internalLicitaciones.value,
   set: (newVal) => internalLicitaciones.value = newVal
 });
-
-const licitacionesAMostrar = computed(() => {
-  return props.item.licitaciones || [];
+const categoriasSeleccionadas = computed({
+  get: () => internalCategorias.value,
+  set: (newVal) => internalCategorias.value = newVal
 });
-
 
 watch(() => props.dialog, newVal => {
   localDialog.value = newVal;
@@ -79,8 +91,9 @@ watch(() => props.item.contactos, newVal => {
   }
 });
 
+
 const agregarContacto = () => {
-  contactos.value.push({ NombreContacto: "", Email: "", Telefono: "" });
+  contactos.value.unshift({ NombreContacto: "", Email: "", Telefono: "" });
 };
 
 const eliminarContacto = (index) => {
@@ -90,16 +103,14 @@ const licitacionSeleccionada = ref(null);
 
 const agregarLicitacion = () => {
   if (licitacionSeleccionada.value) {
-    licitacionesSeleccionadas.value.push(licitacionSeleccionada.value);
+    licitacionesSeleccionadas.value.unshift(licitacionSeleccionada.value);
     licitacionSeleccionada.value = null;
   }
 };
 
-
 const eliminarLicitacion = (item, index) => {
   licitacionesSeleccionadas.value.splice(index, 1);
 };
-
 
 const licitacionesDisponibles = computed(() => {
   return props.licitacionesCargadas.filter(licitacion =>
@@ -108,6 +119,26 @@ const licitacionesDisponibles = computed(() => {
     )
   );
 });
+const categoriasDisponibles = computed(() => {
+  return props.categoriasCargadas.filter(categoria =>
+    !categoriasSeleccionadas.value.some(seleccionada =>
+      seleccionada.CategoriaID === categoria.CategoriaID
+    )
+  );
+});
+
+const categoriaSeleccionada = ref(null);
+
+const agregarCategoria = () => {
+  if (categoriaSeleccionada.value) {
+    categoriasSeleccionadas.value.unshift(categoriaSeleccionada.value);
+    categoriaSeleccionada.value = null;
+  }
+};
+
+const eliminarCategoria = (item, index) => {
+  categoriasSeleccionadas.value.splice(index, 1);
+};
 </script>
 <template>
   <VDialog v-model="localDialog" width="720" @click:outside="close" style="overflow-y: auto;">
@@ -117,6 +148,7 @@ const licitacionesDisponibles = computed(() => {
         <VTab>Proveedor</VTab>
         <VTab>Licitaciónes</VTab>
         <VTab>Contactos</VTab>
+        <VTab>Categorías</VTab>
       </VTabs>
       <VCardText>
         <VWindow v-model="currentTab">
@@ -200,6 +232,40 @@ const licitacionesDisponibles = computed(() => {
               </VCol>
             </VRow>
           </VWindowItem>
+          <VWindowItem key="3">
+            <VRow class="mt-1">
+              <VCol cols="12" sm="12" md="10">
+                <AppAutocomplete item-title="Categoria" :items="categoriasDisponibles" placeholder="Seleccionar Categoría"
+                  return-object v-model="categoriaSeleccionada">
+                  <template v-slot:no-data>
+                    <div class="px-4">No existen datos</div>
+                  </template>
+                </AppAutocomplete>
+              </VCol>
+              <VCol cols="12" sm="12" md="2">
+                <VBtn @click="agregarCategoria" small color="primary" class="ml-2">
+                  +
+                </VBtn>
+              </VCol>
+            </VRow>
+
+            <VDataTable :items="categoriasSeleccionadas" :headers="[
+              { title: 'ID', key: 'CategoriaID' },
+              { title: 'Categoría', key: 'Categoria' },
+              { title: 'Acciones', key: 'actions', sortable: false }
+            ]" class="mt-3" style="max-height: 300px; overflow-y: auto;">
+              <template v-slot:item.actions="{ item, index }">
+                <VBtn small icon color="error" @click="eliminarCategoria(item, index)">
+                  <VIcon>mdi-delete</VIcon>
+                </VBtn>
+              </template>
+              <template v-slot:no-data>
+                Sin categorías seleccionadas.
+              </template>
+            </VDataTable>
+
+          </VWindowItem>
+
 
         </VWindow>
       </VCardText>
