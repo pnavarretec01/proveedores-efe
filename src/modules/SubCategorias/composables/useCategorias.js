@@ -5,10 +5,11 @@ const apiBaseURL = import.meta.env.VITE_API_URL;
 
 export function useCategorias(snackbar, snackbarColor, snackbarMessage) {
   const data = ref([]);
+  const dataCategorias = ref([]);
 
   const fetchItems = async () => {
     try {
-      const response = await axios.get(apiBaseURL + "categorias");
+      const response = await axios.get(apiBaseURL + "subcategorias");
       data.value = response.data.data;
     } catch (err) {
       snackbarMessage.value = err.response.data.message;
@@ -16,14 +17,22 @@ export function useCategorias(snackbar, snackbarColor, snackbarMessage) {
       snackbar.value = true;
     }
   };
+  const fetchItemsCategorias = async () => {
+    try {
+      const response = await axios.get(apiBaseURL + "categorias");
+      dataCategorias.value = response.data.data;
+    } catch (err) {
+      snackbarMessage.value = err.response.data.message;
+      snackbarColor.value = "error";
+      snackbar.value = true;
+    }
+  };
 
-  onMounted(() => {
-    fetchItems();
-  });
   const createItem = async (item) => {
     try {
-      const response = await axios.post(apiBaseURL + "categorias", {
-        Categoria: item.Categoria,
+      const response = await axios.post(apiBaseURL + "subcategorias", {
+        SubCategoria: item.SubCategoria,
+        CategoriaID: item.CategoriaID,
       });
       data.value.unshift(response.data.data);
       snackbarMessage.value = "Elemento creado con éxito";
@@ -41,8 +50,12 @@ export function useCategorias(snackbar, snackbarColor, snackbarMessage) {
   const editItem = async (item) => {
     try {
       const response = await axios.put(
-        apiBaseURL + "categorias/" + item.CategoriaID,
-        item
+        apiBaseURL + "subcategorias/" + item.SubCategoriaID,
+        {
+          SubCategoriaID: item.SubCategoriaID,
+          SubCategoria: item.SubCategoria,
+          CategoriaID: item.Categoria.CategoriaID,
+        }
       );
       snackbarMessage.value = "Elemento editado con éxito";
       snackbarColor.value = "success";
@@ -58,7 +71,7 @@ export function useCategorias(snackbar, snackbarColor, snackbarMessage) {
 
   const deleteItemApi = async (id) => {
     try {
-      await axios.delete(apiBaseURL + "categorias/" + id);
+      await axios.delete(apiBaseURL + "subcategorias/" + id);
       snackbarMessage.value = "Elemento eliminado con éxito";
       snackbarColor.value = "success";
       snackbar.value = true;
@@ -70,8 +83,14 @@ export function useCategorias(snackbar, snackbarColor, snackbarMessage) {
     }
   };
 
+  onMounted(() => {
+    fetchItems();
+    fetchItemsCategorias();
+  });
+
   return {
     data,
+    dataCategorias,
     fetchItems,
     createItem,
     deleteItemApi,

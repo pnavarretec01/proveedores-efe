@@ -13,6 +13,7 @@ export const useLogica = (
 ) => {
   const datosEditar = ref({
     proveedor: {
+      ProveedorID: "",
       NombreProveedor: "",
       Referencia: "",
       CodSap: "",
@@ -34,8 +35,8 @@ export const useLogica = (
     });
   };
 
-  const guardar = async () => {
-    console.log("guardar", datosEditar.value);
+  const guardarItem = async (datos) => {
+    console.log("Datos recibidos en guardar:", datos);
 
     const { proveedor, licitaciones, contactos } = datosEditar.value;
     const { ProveedorID, NombreProveedor } = proveedor;
@@ -75,6 +76,7 @@ export const useLogica = (
   const abrirEditarItem = (item) => {
     datosEditar.value = {
       proveedor: {
+        ProveedorID: item.raw.ProveedorID,
         NombreProveedor: item.raw.NombreProveedor,
         Referencia: item.raw.Referencia,
         CodSap: item.raw.CodSap,
@@ -163,7 +165,7 @@ export const useLogica = (
 
   return {
     datosEditar,
-    guardar,
+    guardarItem,
     abrirEditarItem,
     crearServicio,
     close,

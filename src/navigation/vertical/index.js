@@ -15,6 +15,11 @@ export default [
     icon: { icon: "tabler-list" },
   },
   {
+    title: "Sub-Categorías",
+    to: { name: "subcategorias-page" },
+    icon: { icon: "tabler-list" },
+  },
+  {
     title: "Servicios",
     to: { name: "servicios-page" },
     icon: { icon: "tabler-arrow-autofit-content" },

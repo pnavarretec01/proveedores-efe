@@ -1,5 +1,6 @@
 <script setup>
 import { ref, watch, isRef } from 'vue';
+import { VDataTable } from 'vuetify/labs/VDataTable'
 const emit = defineEmits();
 
 const props = defineProps({
@@ -7,7 +8,7 @@ const props = defineProps({
     type: Object,
     required: true
   },
-  licitaciones: {
+  licitacionesCargadas: {
     type: Object,
     required: true
   },
@@ -18,9 +19,24 @@ const props = defineProps({
 });
 const localDialog = ref(props.dialog);
 
-const actualizarLicitaciones = (values) => {
-  licitacionesSeleccionadas.value = values
-}
+const internalLicitaciones = ref([...(props.item.licitaciones || [])]);
+watch(() => props.item.licitaciones, newVal => {
+  if (newVal && newVal.length) {
+    internalLicitaciones.value = [...newVal];
+  } else {
+    internalLicitaciones.value = [];
+  }
+}, { immediate: true });
+
+const licitacionesSeleccionadas = computed({
+  get: () => internalLicitaciones.value,
+  set: (newVal) => internalLicitaciones.value = newVal
+});
+
+const licitacionesAMostrar = computed(() => {
+  return props.item.licitaciones || [];
+});
+
 
 watch(() => props.dialog, newVal => {
   localDialog.value = newVal;
@@ -38,26 +54,22 @@ const close = () => {
 
 const guardar = () => {
   const datos = {
-    proveedor: {
-      NombreProveedor: props.item.proveedor.NombreProveedor,
-      Referencia: props.item.proveedor.Referencia,
-      CodSap: props.item.proveedor.CodSap,
-      NroIdentificacion: props.item.proveedor.NroIdentificacion,
-      Poblacion: props.item.proveedor.Poblacion,
-      Calle: props.item.proveedor.Calle,
-      Direccion: props.item.proveedor.Direccion,
-    },
+    proveedor: { ...props.item.proveedor },
     licitaciones: licitacionesSeleccionadas.value,
-    contactos: contactos.value
+    contactos: { ...props.item.contactos }
   };
-  console.log(datos);
   emit('guardarItem', datos);
+  licitacionesSeleccionadas = []
 };
+
 
 const currentTab = ref(0)
 
-const contactos = ref(props.item.contactos ? props.item.contactos : [{ NombreContacto: "", Email: "", Telefono: "" }]);
-const licitacionesSeleccionadas = ref(props.item.licitaciones ? props.item.licitaciones : []);
+const contactos = computed({
+  get: () => props.item.contactos || [{ NombreContacto: "", Email: "", Telefono: "" }],
+  set: val => props.item.contactos = val
+});
+
 
 watch(() => props.item.contactos, newVal => {
   if (newVal && newVal.length) {
@@ -74,12 +86,33 @@ const agregarContacto = () => {
 const eliminarContacto = (index) => {
   contactos.value.splice(index, 1);
 };
+const licitacionSeleccionada = ref(null);
 
+const agregarLicitacion = () => {
+  if (licitacionSeleccionada.value) {
+    licitacionesSeleccionadas.value.push(licitacionSeleccionada.value);
+    licitacionSeleccionada.value = null;
+  }
+};
+
+
+const eliminarLicitacion = (item, index) => {
+  licitacionesSeleccionadas.value.splice(index, 1);
+};
+
+
+const licitacionesDisponibles = computed(() => {
+  return props.licitacionesCargadas.filter(licitacion =>
+    !licitacionesSeleccionadas.value.some(seleccionada =>
+      seleccionada.LicitacionID === licitacion.LicitacionID
+    )
+  );
+});
 </script>
 <template>
-  <VDialog v-model="localDialog" width="720" @click:outside="close">
+  <VDialog v-model="localDialog" width="720" @click:outside="close" style="overflow-y: auto;">
     <DialogCloseBtn @click="close" />
-    <VCard :title="item.proveedor ? 'Editar Proveedor' : 'Crear Proveedor'">
+    <VCard :title="item.proveedor && item.proveedor.ProveedorID ? 'Editar Proveedor' : 'Crear Proveedor'">
       <VTabs v-model="currentTab">
         <VTab>Proveedor</VTab>
         <VTab>Licitaciónes</VTab>
@@ -113,13 +146,34 @@ const eliminarContacto = (index) => {
             </VRow>
           </VWindowItem>
           <VWindowItem key="1">
-            <AppAutocomplete small-chips item-title="Licitacion" :items="licitaciones"
-              placeholder="Seleccionar Licitación" chips closable-chips multiple eager return-object
-              @update:modelValue="actualizarLicitaciones">
-              <template v-slot:no-data>
-                <div class="px-4">No existen datos</div>
+            <VRow class="mt-1">
+              <VCol cols="12" sm="12" md="10">
+                <AppAutocomplete v-if="licitacionesDisponibles && licitacionesDisponibles.length" item-title="Licitacion"
+                  :items="licitacionesDisponibles" placeholder="Seleccionar Licitación" return-object
+                  v-model="licitacionSeleccionada">
+                  <template v-slot:no-data>
+                    <div class="px-4">No existen datos</div>
+                  </template>
+                </AppAutocomplete>
+              </VCol>
+              <VCol cols="12" sm="12" md="2">
+                <VBtn @click="agregarLicitacion" small color="primary" class="ml-2">
+                  +
+                </VBtn>
+              </VCol>
+            </VRow>
+            <VDataTable :items="licitacionesSeleccionadas"
+              :headers="[{ title: 'Licitacion', key: 'Licitacion' }, { title: 'Acciones', key: 'actions', sortable: false }]"
+              class="mt-3" style="max-height: 300px; overflow-y: auto;">
+              <template v-slot:item.actions="{ item, index }">
+                <VBtn small icon color="error" @click="eliminarLicitacion(item, index)">
+                  <VIcon>mdi-delete</VIcon>
+                </VBtn>
               </template>
-            </AppAutocomplete>
+              <template v-slot:no-data>
+                Sin licitaciones seleccionadas.
+              </template>
+            </VDataTable>
           </VWindowItem>
           <VWindowItem key="2">
             <VContainer style="max-height: 400px; overflow-y: auto;">

@@ -12,22 +12,21 @@ export const useCategoriaLogica = (
   editItem
 ) => {
   const itemEditar = ref({
-    categoria: "",
+    SubCategoria: "",
   });
 
   const servicioExiste = (nombre, excludeId = null) => {
     return data.value.some((item) => {
-      if (excludeId && item.CategoriaID === excludeId) {
+      if (excludeId && item.SubCategoriaID === excludeId) {
         return false;
       }
-      console.log(item.Categoria);
-      console.log(nombre);
       return item.Categoria.toLowerCase() === nombre.toLowerCase();
     });
   };
 
   const guardar = async () => {
-    const { CategoriaID, Categoria } = itemEditar.value;
+    const { SubCategoriaID, SubCategoria, Categoria } = itemEditar.value;
+    // const { CategoriaID } = Categoria.value;
 
     // if (servicioExiste(Categoria, CategoriaID)) {
     //   alert("Esta Categoria ya existe!");
@@ -35,19 +34,20 @@ export const useCategoriaLogica = (
     // }
 
     try {
-      if (CategoriaID) {
+      if (SubCategoriaID) {
         await editItem(itemEditar.value);
         //await editar
         const index = data.value.findIndex(
-          (item) => item.CategoriaID === CategoriaID
+          (item) => item.SubCategoriaID === SubCategoriaID
         );
         if (index !== -1) {
           data.value[index] = { ...itemEditar.value };
         }
       } else {
         const item = {
-          CategoriaID: itemEditar.value.CategoriaID,
-          Categoria: itemEditar.value.Categoria,
+          SubCategoriaID: itemEditar.value.SubCategoriaID,
+          SubCategoria: itemEditar.value.SubCategoria,
+          CategoriaID: Categoria.CategoriaID
         };
         await createItem(item);
       }
@@ -59,7 +59,8 @@ export const useCategoriaLogica = (
 
   const abrirEditarCategoria = (item) => {
     itemEditar.value = {
-      CategoriaID: item.raw.CategoriaID,
+      SubCategoriaID: item.raw.SubCategoriaID,
+      SubCategoria: item.raw.SubCategoria,
       Categoria: item.raw.Categoria,
     };
     abrirDialog.value = true;
@@ -67,7 +68,7 @@ export const useCategoriaLogica = (
 
   const crearCategoria = () => {
     itemEditar.value = {
-      Categoria: "",
+      SubCategoria: "",
     };
     abrirDialog.value = true;
   };
@@ -83,16 +84,16 @@ export const useCategoriaLogica = (
 
   const abrirEliminarCategoria = (item) => {
     itemEditar.value = {
-      CategoriaID: item,
+      SubCategoriaID: item,
     };
     abrirDialogEliminar.value = true;
   };
 
   const confirmarEliminarCategoria = async (itemId) => {
     try {
-      await deleteItemApi(itemId.CategoriaID.CategoriaID);
+      await deleteItemApi(itemId.SubCategoriaID.SubCategoriaID);
       const index = data.value.findIndex(
-        (item) => item.CategoriaID === itemId.CategoriaID.CategoriaID
+        (item) => item.SubCategoriaID === itemId.SubCategoriaID.SubCategoriaID
       );
       if (index !== -1) {
         data.value.splice(index, 1);

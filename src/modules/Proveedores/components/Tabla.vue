@@ -35,7 +35,7 @@ const { data, totalItems, fetchItems, createItem, deleteItemApi, editItem } = us
 onMounted(() => fetchItems(filters.value, options.value.page, options.value.itemsPerPage));
 const {
   datosEditar,
-  guardar,
+  guardarItem,
   abrirEditarItem,
   crearServicio,
   close,
@@ -183,8 +183,8 @@ function loadItems(newOptions) {
       </template>
       <!-- <template #bottom></template> -->
     </VDataTableServer>
-    <serviciosDialog :item="datosEditar" :licitaciones="licitaciones" :dialog="abrirDialog" @close="close"
-      @guardarItem="guardar" />
+    <serviciosDialog :item="datosEditar" :licitacionesCargadas="licitaciones" :dialog="abrirDialog" @close="close"
+      @guardarItem="guardarItem(datosEditar)" />
     <serviciosDialogEliminar :item="datosEditar" :dialog="abrirDialogEliminar" @closeDelete="closeDelete"
       @confirmarEliminar="confirmarEliminar" />
     <VSnackbar v-model="snackbar" :color="snackbarColor" location="top end" :timeout="2000">

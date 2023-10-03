@@ -5,6 +5,7 @@ import { useCategorias } from '../composables/useCategorias';
 import { useCategoriaLogica } from '../composables/useCategoriaLogica';
 import categoriasDialog from './Dialog-Agregar-Categorias.vue'
 import categoriasDialogEliminar from './Dialog-Eliminar.vue'
+import { watch } from 'vue';
 
 const search = ref('')
 const abrirDialog = ref(false);
@@ -18,7 +19,7 @@ const { data,
   fetchItems,
   createItem,
   deleteItemApi,
-  editItem, } = useCategorias(snackbar, snackbarColor, snackbarMessage);
+  editItem, dataCategorias } = useCategorias(snackbar, snackbarColor, snackbarMessage);
 const {
   itemEditar,
   guardar,
@@ -31,10 +32,14 @@ const {
   abrirEliminarCategoria
 } = useCategoriaLogica(data, abrirDialog, abrirDialogEliminar, snackbar, snackbarColor, snackbarMessage, createItem, deleteItemApi, editItem);
 
+const categorias = ref({})
+watch(() => dataCategorias.value, newVal => {
+  categorias.value = newVal
+});
 const headers = [
   {
-    title: 'Categoría',
-    key: 'Categoria',
+    title: 'SubCategoría',
+    key: 'SubCategoria',
   },
   {
     title: 'Acciones',
@@ -66,7 +71,7 @@ watch(options, newVal => {
   <div>
     <div class="me-3 d-flex gap-3 mb-4 mt-1">
       <VBtn prepend-icon="tabler-plus" @click="crearCategoria">
-        Crear Nueva Categoría
+        Crear Nueva Sub-Categoría
       </VBtn>
     </div>
 
@@ -108,7 +113,7 @@ watch(options, newVal => {
         </VCardText>
       </template> -->
     </VDataTable>
-    <categoriasDialog :item="itemEditar" :dialog="abrirDialog" @close="close" @guardarCategoria="guardar" />
+    <categoriasDialog :item="itemEditar" :categorias="categorias" :dialog="abrirDialog" @close="close" @guardarCategoria="guardar" />
     <categoriasDialogEliminar :item="itemEditar" :dialog="abrirDialogEliminar" @close="closeDelete"
       @confirmarEliminar="confirmarEliminarCategoria" />
     <VSnackbar v-model="snackbar" :color="snackbarColor" location="top end" :timeout="2000">
