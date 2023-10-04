@@ -36,12 +36,59 @@ export const useLogica = (
     });
   };
 
+  function validateForm(proveedor) {
+    if (!proveedor.NombreProveedor) {
+      snackbarMessage.value = "Por favor, ingrese un Nombre Proveedor.";
+      snackbarColor.value = "info";
+      snackbar.value = true;
+      return false;
+    }
+    if (!proveedor.Referencia) {
+      snackbarMessage.value = "Por favor, ingrese una Referencia.";
+      snackbarColor.value = "info";
+      snackbar.value = true;
+      return false;
+    }
+    if (!proveedor.CodSap) {
+      snackbarMessage.value = "Por favor, ingrese un CodSap.";
+      snackbarColor.value = "info";
+      snackbar.value = true;
+      return false;
+    }
+    if (!proveedor.NroIdentificacion) {
+      snackbarMessage.value = "Por favor, ingrese un Nro Identificación.";
+      snackbarColor.value = "info";
+      snackbar.value = true;
+      return false;
+    }
+    if (!proveedor.Poblacion) {
+      snackbarMessage.value = "Por favor, ingrese una Población.";
+      snackbarColor.value = "info";
+      snackbar.value = true;
+      return false;
+    }
+    if (!proveedor.Calle) {
+      snackbarMessage.value = "Por favor, ingrese una Calle.";
+      snackbarColor.value = "info";
+      snackbar.value = true;
+      return false;
+    }
+
+    return true;
+  }
+
   const guardarItem = async (datos) => {
+
     const { proveedor, licitaciones, contactos } = datosEditar.value;
+    if (!validateForm(proveedor)) {
+      return;
+    }
     const { ProveedorID, NombreProveedor } = proveedor;
 
     if (servicioExiste(NombreProveedor, ProveedorID)) {
-      alert("Este Proveedor ya existe!");
+      snackbarMessage.value = "Ya existe un Proveedor con este nombre.";
+      snackbarColor.value = "info";
+      snackbar.value = true;
       return;
     }
 
