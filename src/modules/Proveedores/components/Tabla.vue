@@ -187,7 +187,7 @@ function loadItems(newOptions) {
       <!-- <template #bottom></template> -->
     </VDataTableServer>
     <serviciosDialog :item="datosEditar" :licitacionesCargadas="licitaciones" :categoriasCargadas="categorias" :dialog="abrirDialog" @close="close"
-      @guardarItem="guardarItem(datosEditar)" />
+      @guardarItem="guardarItem(datosEditar)" @updateData="fetchWithFilters"/>
     <serviciosDialogEliminar :item="datosEditar" :dialog="abrirDialogEliminar" @closeDelete="closeDelete"
       @confirmarEliminar="confirmarEliminar" />
     <VSnackbar v-model="snackbar" :color="snackbarColor" location="top end" :timeout="2000">

@@ -108,16 +108,7 @@ watch(() => props.item.contactos, newVal => {
 });
 
 const agregarContacto = () => {
-  const nuevoContacto = { NombreContacto: "", Email: "", Telefono: "" };
-  agregarContactoApi(props.item.proveedor.ProveedorID, 'contactos', 'POST', nuevoContacto)
-    .then(response => {
-      if (response.success) {
-        contactos.value.unshift(response.data);
-      }
-    })
-    .catch(error => {
-      console.error("Hubo un error al agregar el contacto", error);
-    });
+  contactos.value.push({ NombreContacto: "", Email: "", Telefono: "" });
 };
 
 
@@ -130,7 +121,6 @@ const eliminarContacto = (index) => {
       console.error("Hubo un error al eliminar el contacto", error);
     });
   } else {
-
     contactos.value.splice(index, 1);
   }
 };
@@ -145,6 +135,8 @@ const guardarContacto = (contacto) => {
     } else {
       contactos.value.unshift(response.data);
     }
+    contactos.value = [{ NombreContacto: "", Email: "", Telefono: "" }];
+    emit('updateData');
   }).catch(error => {
     console.error("Hubo un error al guardar el contacto", error);
   });
@@ -155,12 +147,11 @@ const licitacionSeleccionada = ref(null);
 
 const guardarLicitacion = (licitacion) => {
   agregarLicitacionApi(props.item.proveedor.ProveedorID, 'licitacionesProveedor', 'PUT', licitacion).then(response => {
-    console.log("Licitación guardada exitosamente!", response);
-
     if (response.success) {
       const data = response.data;
 
       licitacionesSeleccionadas.value.unshift(data);
+      emit('updateData');
     }
   }).catch(error => {
     console.error("Hubo un error al guardar la licitación", error);
@@ -180,6 +171,7 @@ const eliminarLicitacion = (item, index) => {
 
   eliminarLicitacionApi(licitacion).then(() => {
     licitacionesSeleccionadas.value.splice(index, 1);
+    emit('updateData');
   }).catch(error => {
     console.error("Hubo un error al eliminar el contacto", error);
   });
@@ -209,6 +201,7 @@ const agregarCategoria = () => {
       if (response.success) {
         const data = response.data;
         categoriasSeleccionadas.value.unshift(data);
+        emit('updateData');
       }
     }).catch(error => {
       console.error("Hubo un error al guardar la categoría", error);
@@ -219,9 +212,9 @@ const agregarCategoria = () => {
 const eliminarCategoria = (CatProID, index) => {
   const categoria = categoriasSeleccionadas.value[index];
 
-
   eliminarCategoriaApi(CatProID).then(() => {
     categoriasSeleccionadas.value.splice(index, 1);
+    emit('updateData');
   }).catch(error => {
     console.error("Hubo un error al eliminar la categoría", error);
   });
