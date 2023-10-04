@@ -26,6 +26,7 @@ const filters = ref({
   Poblacion: '',
   Calle: '',
   Direccion: '',
+  estado: '',
 });
 
 const { fetchLicitaciones,
@@ -69,9 +70,14 @@ const headers = [
     title: 'Cod SAP',
     key: 'CodSap',
   },
+  // {
+  //   title: 'Nro_identificacion',
+  //   key: 'NroIdentificacion',
+  // },
   {
-    title: 'Nro_identificacion',
-    key: 'NroIdentificacion',
+    title: 'Adjudicado',
+    key: 'licitacionStatus',
+    sortable: false,
   },
   {
     title: 'Acciones',
@@ -110,6 +116,7 @@ function clearFilters() {
     Poblacion: '',
     Calle: '',
     Direccion: '',
+    estado: '',
   };
 }
 function loadItems(newOptions) {
@@ -151,6 +158,10 @@ function loadItems(newOptions) {
       <VCol cols="12" sm="6" md="2">
         <AppTextField v-model="filters.Direccion" label="Direccion" outlined />
       </VCol>
+      <!-- <VCol cols="12" sm="6" md="2">
+        <VSelect v-model="filters.licitacionStatus" :items="['Adjudicado', 'Participación', 'Propuesto', 'Todos']"
+          label="Estado" outlined></VSelect>
+      </VCol> -->
       <VCol cols="12" sm="6" md="2" class="d-flex flex-column justify-space-between">
         <VBtn class="mb-1" @click="fetchWithFilters">Buscar</VBtn>
         <VBtn @click="clearFilters">Limpiar</VBtn>
@@ -173,6 +184,18 @@ function loadItems(newOptions) {
           </td>
         </tr>
       </template>
+
+      <template v-slot:item.licitacionStatus="{ item }">
+        <VChip label color="info" v-if="item.value.Licitaciones && item.value.Licitaciones.length > 1">
+          Adjudicado
+        </VChip>
+        <VChip label color="success" v-if="item.value.Licitaciones && item.value.Licitaciones.length == 1">
+          Participación
+        </VChip>
+        <VChip label color="default" v-if="!item.value.Licitaciones.length">
+          Propuesto
+        </VChip>
+      </template>
       <template v-slot:item.actions="{ item }">
         <IconBtn>
           <VIcon icon="tabler-edit" @click="abrirEditarItem(item)" />
@@ -186,8 +209,8 @@ function loadItems(newOptions) {
       </template>
       <!-- <template #bottom></template> -->
     </VDataTableServer>
-    <serviciosDialog :item="datosEditar" :licitacionesCargadas="licitaciones" :categoriasCargadas="categorias" :dialog="abrirDialog" @close="close"
-      @guardarItem="guardarItem(datosEditar)" @updateData="fetchWithFilters"/>
+    <serviciosDialog :item="datosEditar" :licitacionesCargadas="licitaciones" :categoriasCargadas="categorias"
+      :dialog="abrirDialog" @close="close" @guardarItem="guardarItem(datosEditar)" @updateData="fetchWithFilters" />
     <serviciosDialogEliminar :item="datosEditar" :dialog="abrirDialogEliminar" @closeDelete="closeDelete"
       @confirmarEliminar="confirmarEliminar" />
     <VSnackbar v-model="snackbar" :color="snackbarColor" location="top end" :timeout="2000">
