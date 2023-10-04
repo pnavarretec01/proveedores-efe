@@ -15,23 +15,45 @@ export const useCategoriaLogica = (
     SubCategoria: "",
   });
 
+  function validateForm(item) {
+    if (!item.SubCategoria) {
+      snackbarMessage.value = "Por favor, ingrese una Sub Categoría.";
+      snackbarColor.value = "info";
+      snackbar.value = true;
+      return false;
+    }
+    if (!item.Categoria) {
+      snackbarMessage.value = "Por favor, ingrese una Categoría.";
+      snackbarColor.value = "info";
+      snackbar.value = true;
+      return false;
+    }
+
+    return true;
+  }
+
   const servicioExiste = (nombre, excludeId = null) => {
     return data.value.some((item) => {
       if (excludeId && item.SubCategoriaID === excludeId) {
         return false;
       }
-      return item.Categoria.toLowerCase() === nombre.toLowerCase();
+      return item.SubCategoria.toLowerCase() === nombre.toLowerCase();
     });
   };
 
   const guardar = async () => {
+    if (!validateForm(itemEditar.value)) {
+      return;
+    }
     const { SubCategoriaID, SubCategoria, Categoria } = itemEditar.value;
-    // const { CategoriaID } = Categoria.value;
+    const { CategoriaID } = Categoria;
 
-    // if (servicioExiste(Categoria, CategoriaID)) {
-    //   alert("Esta Categoria ya existe!");
-    //   return;
-    // }
+    if (servicioExiste(SubCategoria, SubCategoriaID)) {
+      snackbarMessage.value = "Ya existe una Sub Categoría con este nombre.";
+      snackbarColor.value = "info";
+      snackbar.value = true;
+      return;
+    }
 
     try {
       if (SubCategoriaID) {
@@ -47,7 +69,7 @@ export const useCategoriaLogica = (
         const item = {
           SubCategoriaID: itemEditar.value.SubCategoriaID,
           SubCategoria: itemEditar.value.SubCategoria,
-          CategoriaID: Categoria.CategoriaID
+          CategoriaID: Categoria.CategoriaID,
         };
         await createItem(item);
       }

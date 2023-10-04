@@ -204,14 +204,16 @@ const categoriasDisponibles = computed(() => {
 const categoriaSeleccionada = ref(null);
 
 const agregarCategoria = () => {
-  agregarCategoriaApi(props.item.proveedor.ProveedorID, categoriaSeleccionada.value.CategoriaID).then(response => {
-    if (response.success) {
-      const data = response.data;
-      categoriasSeleccionadas.value.unshift(data);
-    }
-  }).catch(error => {
-    console.error("Hubo un error al guardar la categoría", error);
-  });
+  if (categoriaSeleccionada.value) {
+    agregarCategoriaApi(props.item.proveedor.ProveedorID, categoriaSeleccionada.value.CategoriaID).then(response => {
+      if (response.success) {
+        const data = response.data;
+        categoriasSeleccionadas.value.unshift(data);
+      }
+    }).catch(error => {
+      console.error("Hubo un error al guardar la categoría", error);
+    });
+  }
 };
 
 const eliminarCategoria = (CatProID, index) => {

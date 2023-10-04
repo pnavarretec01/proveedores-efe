@@ -52,7 +52,7 @@ watch(() => props.item.Categoria, newVal => {
             <VTextField v-model="item.SubCategoria" label="Sub-Categoría" />
           </VCol>
           <VCol cols="12" sm="12" md="12">
-            <AppAutocomplete item-title="Categoria" :items="categorias" placeholder="Seleccionar Licitación" return-object
+            <AppAutocomplete item-title="Categoria" :items="categorias" placeholder="Seleccionar Categoría" return-object
               v-model="item.Categoria">
               <template v-slot:no-data>
                 <div class="px-4">No existen datos</div>

@@ -15,24 +15,38 @@ export const useCategoriaLogica = (
     categoria: "",
   });
 
+  function validateForm(item) {
+    if (!item.Categoria) {
+      snackbarMessage.value = "Por favor, ingrese una Categoría.";
+      snackbarColor.value = "info";
+      snackbar.value = true;
+      return false;
+    }
+
+    return true;
+  }
+
   const servicioExiste = (nombre, excludeId = null) => {
     return data.value.some((item) => {
       if (excludeId && item.CategoriaID === excludeId) {
         return false;
       }
-      console.log(item.Categoria);
-      console.log(nombre);
       return item.Categoria.toLowerCase() === nombre.toLowerCase();
     });
   };
 
   const guardar = async () => {
+    if (!validateForm(itemEditar.value)) {
+      return;
+    }
     const { CategoriaID, Categoria } = itemEditar.value;
 
-    // if (servicioExiste(Categoria, CategoriaID)) {
-    //   alert("Esta Categoria ya existe!");
-    //   return;
-    // }
+    if (servicioExiste(Categoria, CategoriaID)) {
+      snackbarMessage.value = "Ya existe una Categoría con este nombre.";
+      snackbarColor.value = "info";
+      snackbar.value = true;
+      return;
+    }
 
     try {
       if (CategoriaID) {

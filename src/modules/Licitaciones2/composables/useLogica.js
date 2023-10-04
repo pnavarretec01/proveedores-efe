@@ -15,6 +15,17 @@ export const useLogica = (
     Licitacion: "",
   });
 
+  function validateForm(item) {
+    if (!item.Licitacion) {
+      snackbarMessage.value = "Por favor, ingrese una Licitación.";
+      snackbarColor.value = "info";
+      snackbar.value = true;
+      return false;
+    }
+
+    return true;
+  }
+
   const servicioExiste = (nombre, excludeId = null) => {
     return data.value.some((item) => {
       if (excludeId && item.LicitacionID === excludeId) {
@@ -25,16 +36,20 @@ export const useLogica = (
   };
 
   const guardar = async () => {
+    if (!validateForm(itemEditar.value)) {
+      return;
+    }
     const { LicitacionID, Licitacion } = itemEditar.value;
 
     if (servicioExiste(Licitacion, LicitacionID)) {
-      alert("Esta Licitacion ya existe!");
+      snackbarMessage.value = "Ya existe una Licitación con este nombre.";
+      snackbarColor.value = "info";
+      snackbar.value = true;
       return;
     }
 
     try {
       if (LicitacionID) {
-        
         await editItem(itemEditar.value);
         //await editar
         const index = data.value.findIndex(
