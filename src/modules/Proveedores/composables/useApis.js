@@ -35,17 +35,15 @@ export function useApis(snackbar, snackbarColor, snackbarMessage) {
   };
 
   const createItem = async (item) => {
-    console.log(item);
-    return
     try {
       const response = await axios.post(apiBaseURL + "proveedores", {
-        NombreProveedor: item.NombreProveedor,
-        Referencia: item.Referencia,
-        CodSap: item.CodSap,
-        NroIdentificacion: item.NroIdentificacion,
-        Poblacion: item.Poblacion,
-        Calle: item.Calle,
-        Direccion: item.Direccion,
+        NombreProveedor: item.proveedor.NombreProveedor,
+        Referencia: item.proveedor.Referencia,
+        CodSap: item.proveedor.CodSap,
+        NroIdentificacion: item.proveedor.NroIdentificacion,
+        Poblacion: item.proveedor.Poblacion,
+        Calle: item.proveedor.Calle,
+        Direccion: item.proveedor.Direccion,
       });
       data.value.unshift(response.data.data);
       snackbarMessage.value = "Elemento creado con éxito";

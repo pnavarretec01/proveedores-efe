@@ -37,11 +37,8 @@ export const useLogica = (
   };
 
   const guardarItem = async (datos) => {
-    console.log("Datos recibidos en guardar:", datos);
-
     const { proveedor, licitaciones, contactos } = datosEditar.value;
     const { ProveedorID, NombreProveedor } = proveedor;
-    return;
 
     if (servicioExiste(NombreProveedor, ProveedorID)) {
       alert("Este Proveedor ya existe!");
@@ -56,7 +53,6 @@ export const useLogica = (
 
     try {
       if (ProveedorID) {
-        return;
         await editItem(proveedorCompleto);
         //await editar
         const index = data.value.findIndex(
@@ -64,6 +60,7 @@ export const useLogica = (
         );
         if (index !== -1) {
           data.value[index] = { ...itemEditar.value };
+          close();
         }
       } else {
         await createItem(datosEditar.value);
@@ -152,9 +149,9 @@ export const useLogica = (
 
   const confirmarEliminar = async (itemId) => {
     try {
-      await deleteItemApi(itemId.ProveedorID.ProveedorID);
+      await deleteItemApi(itemId.ProveedorID);
       const index = data.value.findIndex(
-        (item) => item.ProveedorID === itemId.ProveedorID.ProveedorID
+        (item) => item.ProveedorID === itemId.ProveedorID
       );
       if (index !== -1) {
         data.value.splice(index, 1);

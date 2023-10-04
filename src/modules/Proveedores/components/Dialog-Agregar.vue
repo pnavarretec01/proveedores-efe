@@ -1,6 +1,14 @@
 <script setup>
 import { ref, watch, isRef } from 'vue';
 import { VDataTable } from 'vuetify/labs/VDataTable'
+import useProveedor from '../composables/useProveedor'
+
+const snackbar = ref(false);
+const snackbarColor = ref("succes");
+const snackbarMessage = ref("");
+
+const { agregarEliminarDato, eliminarContactoApi, agregarContactoApi, agregarLicitacionApi, eliminarLicitacionApi, agregarCategoriaApi,
+  eliminarCategoriaApi, } = useProveedor(snackbar, snackbarColor, snackbarMessage);
 const emit = defineEmits();
 
 const props = defineProps({
@@ -23,15 +31,23 @@ const props = defineProps({
 });
 const localDialog = ref(props.dialog);
 
+
+
 const internalLicitaciones = ref([...(props.item.licitaciones || [])]);
 const internalCategorias = ref([...(props.item.categoriasProveedor ? props.item.categoriasProveedor.map(cat => cat.Categoria) : [])]);
 watch(() => props.item.categoriasProveedor, newVal => {
   if (newVal && newVal.length) {
-    internalCategorias.value = [...newVal.map(cat => cat.Categoria)];
+    internalCategorias.value = [...newVal.map(cat => {
+      return {
+        ...cat.Categoria,
+        CatProID: cat.CatProID
+      }
+    })];
   } else {
     internalCategorias.value = [];
   }
 }, { immediate: true });
+
 
 watch(() => props.item.licitaciones, newVal => {
   if (newVal && newVal.length) {
@@ -71,7 +87,7 @@ const guardar = () => {
     contactos: { ...props.item.contactos }
   };
   emit('guardarItem', datos);
-  licitacionesSeleccionadas = []
+  licitacionesSeleccionadas.value = []
 };
 
 
@@ -91,25 +107,83 @@ watch(() => props.item.contactos, newVal => {
   }
 });
 
-
 const agregarContacto = () => {
-  contactos.value.unshift({ NombreContacto: "", Email: "", Telefono: "" });
+  const nuevoContacto = { NombreContacto: "", Email: "", Telefono: "" };
+  agregarContactoApi(props.item.proveedor.ProveedorID, 'contactos', 'POST', nuevoContacto)
+    .then(response => {
+      if (response.success) {
+        contactos.value.unshift(response.data);
+      }
+    })
+    .catch(error => {
+      console.error("Hubo un error al agregar el contacto", error);
+    });
 };
+
 
 const eliminarContacto = (index) => {
-  contactos.value.splice(index, 1);
+  const contacto = contactos.value[index];
+  if (contacto.ContactoID) {
+    eliminarContactoApi(props.item.proveedor.ProveedorID, 'contactos', 'DELETE', contacto).then(() => {
+      contactos.value.splice(index, 1);
+    }).catch(error => {
+      console.error("Hubo un error al eliminar el contacto", error);
+    });
+  } else {
+
+    contactos.value.splice(index, 1);
+  }
 };
+
+const guardarContacto = (contacto) => {
+  agregarContactoApi(props.item.proveedor.ProveedorID, 'contactos', 'POST', contacto).then(response => {
+    if (contacto.ContactoID) {
+      const index = contactos.value.findIndex(c => c.ContactoID === contacto.ContactoID);
+      if (index !== -1) {
+        contactos.value[index] = response.data;
+      }
+    } else {
+      contactos.value.unshift(response.data);
+    }
+  }).catch(error => {
+    console.error("Hubo un error al guardar el contacto", error);
+  });
+};
+
+
 const licitacionSeleccionada = ref(null);
+
+const guardarLicitacion = (licitacion) => {
+  agregarLicitacionApi(props.item.proveedor.ProveedorID, 'licitacionesProveedor', 'PUT', licitacion).then(response => {
+    console.log("Licitación guardada exitosamente!", response);
+
+    if (response.success) {
+      const data = response.data;
+
+      licitacionesSeleccionadas.value.unshift(data);
+    }
+  }).catch(error => {
+    console.error("Hubo un error al guardar la licitación", error);
+  });
+};
+
 
 const agregarLicitacion = () => {
   if (licitacionSeleccionada.value) {
-    licitacionesSeleccionadas.value.unshift(licitacionSeleccionada.value);
+    guardarLicitacion(licitacionSeleccionada.value);
     licitacionSeleccionada.value = null;
   }
 };
 
 const eliminarLicitacion = (item, index) => {
-  licitacionesSeleccionadas.value.splice(index, 1);
+  const licitacion = licitacionesSeleccionadas.value[index];
+
+  eliminarLicitacionApi(licitacion).then(() => {
+    licitacionesSeleccionadas.value.splice(index, 1);
+  }).catch(error => {
+    console.error("Hubo un error al eliminar el contacto", error);
+  });
+
 };
 
 const licitacionesDisponibles = computed(() => {
@@ -130,14 +204,26 @@ const categoriasDisponibles = computed(() => {
 const categoriaSeleccionada = ref(null);
 
 const agregarCategoria = () => {
-  if (categoriaSeleccionada.value) {
-    categoriasSeleccionadas.value.unshift(categoriaSeleccionada.value);
-    categoriaSeleccionada.value = null;
-  }
+  agregarCategoriaApi(props.item.proveedor.ProveedorID, categoriaSeleccionada.value.CategoriaID).then(response => {
+    if (response.success) {
+      const data = response.data;
+      categoriasSeleccionadas.value.unshift(data);
+    }
+  }).catch(error => {
+    console.error("Hubo un error al guardar la categoría", error);
+  });
 };
 
-const eliminarCategoria = (item, index) => {
-  categoriasSeleccionadas.value.splice(index, 1);
+const eliminarCategoria = (CatProID, index) => {
+  const categoria = categoriasSeleccionadas.value[index];
+
+
+  eliminarCategoriaApi(CatProID).then(() => {
+    categoriasSeleccionadas.value.splice(index, 1);
+  }).catch(error => {
+    console.error("Hubo un error al eliminar la categoría", error);
+  });
+  //categoriasSeleccionadas.value.splice(index, 1);
 };
 </script>
 <template>
@@ -146,9 +232,9 @@ const eliminarCategoria = (item, index) => {
     <VCard :title="item.proveedor && item.proveedor.ProveedorID ? 'Editar Proveedor' : 'Crear Proveedor'">
       <VTabs v-model="currentTab">
         <VTab>Proveedor</VTab>
-        <VTab>Licitaciónes</VTab>
-        <VTab>Contactos</VTab>
-        <VTab>Categorías</VTab>
+        <VTab v-if="item.proveedor && item.proveedor.ProveedorID">Licitaciónes</VTab>
+        <VTab v-if="item.proveedor && item.proveedor.ProveedorID">Contactos</VTab>
+        <VTab v-if="item.proveedor && item.proveedor.ProveedorID">Categorías</VTab>
       </VTabs>
       <VCardText>
         <VWindow v-model="currentTab">
@@ -220,6 +306,9 @@ const eliminarCategoria = (item, index) => {
                   <VTextField v-model="contacto.Telefono" label="Teléfono" />
                 </VCol>
                 <VCol cols="12" sm="12" md="2">
+                  <VBtn small icon color="success" @click="guardarContacto(contacto)">
+                    <VIcon>mdi-content-save</VIcon>
+                  </VBtn>
                   <VBtn small icon color="error" @click="eliminarContacto(index)">
                     <VIcon>mdi-delete</VIcon>
                   </VBtn>
@@ -250,12 +339,27 @@ const eliminarCategoria = (item, index) => {
             </VRow>
 
             <VDataTable :items="categoriasSeleccionadas" :headers="[
-              { title: 'ID', key: 'CategoriaID' },
+              {
+                title: '',
+                key: 'data-table-expand',
+              },
               { title: 'Categoría', key: 'Categoria' },
               { title: 'Acciones', key: 'actions', sortable: false }
-            ]" class="mt-3" style="max-height: 300px; overflow-y: auto;">
+            ]" class="mt-3" style="max-height: 300px; overflow-y: auto;" expand-on-click>
+              <template #expanded-row="slotProps">
+                <tr>
+                  <td colspan="100%">
+                    <strong>Subcategorias:</strong>
+                    <ul>
+                      <li v-for="sub in slotProps.item.raw.SubCategorias" :key="sub.SubCategoriaID">
+                        {{ sub.SubCategoria }}
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+              </template>
               <template v-slot:item.actions="{ item, index }">
-                <VBtn small icon color="error" @click="eliminarCategoria(item, index)">
+                <VBtn small icon color="error" @click="eliminarCategoria(item.value.CatProID, index)">
                   <VIcon>mdi-delete</VIcon>
                 </VBtn>
               </template>
@@ -263,19 +367,18 @@ const eliminarCategoria = (item, index) => {
                 Sin categorías seleccionadas.
               </template>
             </VDataTable>
-
           </VWindowItem>
-
-
         </VWindow>
       </VCardText>
-
       <VCardActions>
         <VSpacer />
         <VBtn color="error" variant="outlined" @click="close">Cancelar</VBtn>
         <VBtn color="success" variant="elevated" @click="guardar">Guardar</VBtn>
       </VCardActions>
     </VCard>
+    <VSnackbar v-model="snackbar" :color="snackbarColor" location="top end" :timeout="2000">
+      {{ snackbarMessage }}
+    </VSnackbar>
   </VDialog>
 </template>
 
