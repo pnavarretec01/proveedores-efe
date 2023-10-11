@@ -44,6 +44,8 @@ export function useApis(snackbar, snackbarColor, snackbarMessage) {
         Poblacion: item.proveedor.Poblacion,
         Calle: item.proveedor.Calle,
         Direccion: item.proveedor.Direccion,
+        Estado: 0,
+        Observacion: item.proveedor.Observacion
       });
       data.value.unshift(response.data.data);
       snackbarMessage.value = "Elemento creado con éxito";

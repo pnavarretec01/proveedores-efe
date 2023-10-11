@@ -253,8 +253,11 @@ const eliminarCategoria = (CatProID, index) => {
               <VCol cols="12" sm="12" md="12">
                 <VTextField v-model="item.proveedor.Calle" label="Calle" />
               </VCol>
-              <VCol cols="12" sm="6" md="6">
+              <VCol cols="12" sm="12" md="12">
                 <VTextField v-model="item.proveedor.Direccion" label="Dirección" />
+              </VCol>
+              <VCol cols="12" sm="12" md="12">
+                <AppTextarea v-model="item.proveedor.Observacion" label="Observación" rows="5"/>
               </VCol>
             </VRow>
           </VWindowItem>

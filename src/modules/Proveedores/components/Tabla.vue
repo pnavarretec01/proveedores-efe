@@ -26,7 +26,7 @@ const filters = ref({
   Poblacion: '',
   Calle: '',
   Direccion: '',
-  estado: '',
+  Estado: '',
 });
 
 const { fetchLicitaciones,
@@ -75,7 +75,7 @@ const headers = [
   //   key: 'NroIdentificacion',
   // },
   {
-    title: 'Adjudicado',
+    title: 'Proponente',
     key: 'licitacionStatus',
     sortable: false,
   },
@@ -116,7 +116,7 @@ function clearFilters() {
     Poblacion: '',
     Calle: '',
     Direccion: '',
-    estado: '',
+    Estado: '',
   };
 }
 function loadItems(newOptions) {
@@ -138,30 +138,29 @@ function loadItems(newOptions) {
     </div>
     <VRow>
       <VCol cols="12" sm="6" md="2">
-        <AppTextField v-model="filters.NombreProveedor" label="Nombre Proveedor" outlined />
+        <VTextField v-model="filters.NombreProveedor" label="Nombre Proveedor" outlined />
       </VCol>
       <VCol cols="12" sm="6" md="2">
-        <AppTextField v-model="filters.Referencia" label="Referencia" outlined />
+        <VTextField v-model="filters.Referencia" label="Referencia" outlined />
       </VCol>
       <VCol cols="12" sm="6" md="2">
-        <AppTextField v-model="filters.CodSap" label="Cod Sap" outlined />
+        <VTextField v-model="filters.CodSap" label="Cod Sap" outlined />
       </VCol>
       <VCol cols="12" sm="6" md="2">
-        <AppTextField v-model="filters.NroIdentificacion" label="Nro Identificación" outlined />
+        <VTextField v-model="filters.NroIdentificacion" label="Nro Identificación" outlined />
       </VCol>
       <VCol cols="12" sm="6" md="2">
-        <AppTextField v-model="filters.Poblacion" label="Poblacion" outlined />
+        <VTextField v-model="filters.Poblacion" label="Poblacion" outlined />
       </VCol>
       <VCol cols="12" sm="6" md="2">
-        <AppTextField v-model="filters.Calle" label="Calle" outlined />
+        <VTextField v-model="filters.Calle" label="Calle" outlined />
       </VCol>
       <VCol cols="12" sm="6" md="2">
-        <AppTextField v-model="filters.Direccion" label="Direccion" outlined />
+        <VTextField v-model="filters.Direccion" label="Direccion" outlined />
       </VCol>
-      <!-- <VCol cols="12" sm="6" md="2">
-        <VSelect v-model="filters.licitacionStatus" :items="['Adjudicado', 'Participación', 'Propuesto', 'Todos']"
-          label="Estado" outlined></VSelect>
-      </VCol> -->
+      <VCol cols="12" sm="6" md="2">
+        <VSelect v-model="filters.Estado" :items="['Si', 'No']" label="Estado" outlined clearable></VSelect>
+      </VCol>
       <VCol cols="12" sm="6" md="2" class="d-flex flex-column justify-space-between">
         <VBtn class="mb-1" @click="fetchWithFilters">Buscar</VBtn>
         <VBtn @click="clearFilters">Limpiar</VBtn>
@@ -184,16 +183,12 @@ function loadItems(newOptions) {
           </td>
         </tr>
       </template>
-
       <template v-slot:item.licitacionStatus="{ item }">
-        <VChip label color="info" v-if="item.value.Licitaciones && item.value.Licitaciones.length > 1">
-          Adjudicado
+        <VChip label color="success" v-if="item.value.Estado > 0">
+          SI
         </VChip>
-        <VChip label color="success" v-if="item.value.Licitaciones && item.value.Licitaciones.length == 1">
-          Participación
-        </VChip>
-        <VChip label color="default" v-if="!item.value.Licitaciones.length">
-          Propuesto
+        <VChip label color="default" v-if="item.value.Estado == 0">
+          NO
         </VChip>
       </template>
       <template v-slot:item.actions="{ item }">

@@ -21,6 +21,8 @@ export const useLogica = (
       Poblacion: "",
       Calle: "",
       Direccion: "",
+      Estado: 0,
+      Observacion: "",
     },
     licitaciones: [],
     contactos: [],
@@ -77,8 +79,16 @@ export const useLogica = (
     return true;
   }
 
-  const guardarItem = async (datos) => {
+  function mapDatosEditarToDataValue(datos) {
+    return {
+      ...datos.proveedor,
+      Licitaciones: datos.licitaciones,
+      Contactos: datos.contactos,
+      CategoriasProveedor: datos.categoriasProveedor,
+    };
+  }
 
+  const guardarItem = async (datos) => {
     const { proveedor, licitaciones, contactos } = datosEditar.value;
     if (!validateForm(proveedor)) {
       return;
@@ -101,12 +111,11 @@ export const useLogica = (
     try {
       if (ProveedorID) {
         await editItem(proveedorCompleto);
-        //await editar
         const index = data.value.findIndex(
           (item) => item.ProveedorID === ProveedorID
         );
         if (index !== -1) {
-          data.value[index] = { ...itemEditar.value };
+          data.value[index] = mapDatosEditarToDataValue(datosEditar.value);
           close();
         }
       } else {
@@ -129,6 +138,8 @@ export const useLogica = (
         Poblacion: item.raw.Poblacion,
         Calle: item.raw.Calle,
         Direccion: item.raw.Direccion,
+        Estado: item.raw.Estado,
+        Observacion: item.raw.Observacion,
       },
       licitaciones: item.raw.Licitaciones || [],
       contactos: item.raw.Contactos || [],
@@ -147,6 +158,8 @@ export const useLogica = (
         Poblacion: "",
         Calle: "",
         Direccion: "",
+        Estado: 0,
+        Observacion: "",
       },
       licitaciones: [],
       contactos: [],
@@ -165,6 +178,8 @@ export const useLogica = (
         Poblacion: "",
         Calle: "",
         Direccion: "",
+        Estado: 0,
+        Observacion: "",
       },
       licitaciones: [],
       contactos: [],
@@ -181,6 +196,8 @@ export const useLogica = (
         Poblacion: "",
         Calle: "",
         Direccion: "",
+        Estado: 0,
+        Observacion: "",
       },
       licitaciones: [],
       contactos: [],
