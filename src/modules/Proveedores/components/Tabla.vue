@@ -159,7 +159,7 @@ function loadItems(newOptions) {
         <VTextField v-model="filters.Direccion" label="Direccion" outlined />
       </VCol>
       <VCol cols="12" sm="6" md="2">
-        <VSelect v-model="filters.Estado" :items="['Si', 'No']" label="Estado" outlined clearable></VSelect>
+        <VSelect v-model="filters.Estado" :items="['Si', 'No']" label="Proponente" outlined clearable></VSelect>
       </VCol>
       <VCol cols="12" sm="6" md="2" class="d-flex flex-column justify-space-between">
         <VBtn class="mb-1" @click="fetchWithFilters">Buscar</VBtn>

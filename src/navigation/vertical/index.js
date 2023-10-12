@@ -19,11 +19,11 @@ export default [
     to: { name: "subcategorias-page" },
     icon: { icon: "tabler-list" },
   },
-  {
-    title: "Servicios",
-    to: { name: "servicios-page" },
-    icon: { icon: "tabler-arrow-autofit-content" },
-  },
+  // {
+  //   title: "Servicios",
+  //   to: { name: "servicios-page" },
+  //   icon: { icon: "tabler-arrow-autofit-content" },
+  // },
   {
     title: "Licitaciones",
     to: { name: "licitaciones-page" },

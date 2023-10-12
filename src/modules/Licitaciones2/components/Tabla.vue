@@ -43,10 +43,6 @@ const {
 
 const headers = [
   {
-    title: 'ID',
-    key: 'LicitacionID',
-  },
-  {
     title: 'Licitación',
     key: 'Licitacion',
   },

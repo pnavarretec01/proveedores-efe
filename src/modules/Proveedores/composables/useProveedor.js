@@ -92,6 +92,7 @@ export default function useProveedor(snackbar, snackbarColor, snackbarMessage) {
       const response = await axios.post(`${baseUrl}licitacionesProveedor`, {
         LicitacionID: data.LicitacionID,
         ProveedorID: proveedorID,
+        Adjudicado: false,
       });
       snackbarMessage.value = "Proceso realizado con éxito";
       snackbarColor.value = "success";
@@ -126,13 +127,35 @@ export default function useProveedor(snackbar, snackbarColor, snackbarMessage) {
     }
   };
 
+  const updateAdjudicadoStatusApi = async (LicProvID, estado) => {
+
+    try {
+      const response = await axios.put(
+        `${baseUrl}licitacionesProveedor/${LicProvID}/adjudicado`,
+        {
+          Adjudicado: estado,
+        }
+      );
+      snackbarMessage.value = "Estado adjudicado actualizado con éxito";
+      snackbarColor.value = "success";
+      snackbar.value = true;
+      return response.data;
+    } catch (err) {
+      snackbarMessage.value = err.response.data.message;
+      snackbarColor.value = "error";
+      snackbar.value = true;
+      throw err;
+    }
+  };
+
   //categorias proveedor
 
-  const agregarCategoriaApi = async (ProveedorID, CategoriaID) => {
+  const agregarCategoriaApi = async (ProveedorID, CategoriaID, SubCategoriaID) => {
     try {
       const response = await axios.post(`${baseUrl}categoriasProveedor`, {
         ProveedorID: ProveedorID,
         CategoriaID: CategoriaID,
+        SubCategoriaID: SubCategoriaID
       });
       snackbarMessage.value = "Proceso realizado con éxito";
       snackbarColor.value = "success";
@@ -165,6 +188,20 @@ export default function useProveedor(snackbar, snackbarColor, snackbarMessage) {
     }
   };
 
+  const getSubcategoriasByCategoria = async (categoriaID) => {
+    try {
+        const response = await axios.get(`${baseUrl}subcategorias/byCategoria/${categoriaID}`);
+        console.log(response.data.data);
+        return response.data.data;
+    } catch (err) {
+        snackbarMessage.value = err.response.data.message;
+        snackbarColor.value = "error";
+        snackbar.value = true;
+        throw err;
+    }
+};
+
+
   return {
     loading,
     error,
@@ -175,5 +212,7 @@ export default function useProveedor(snackbar, snackbarColor, snackbarMessage) {
     eliminarLicitacionApi,
     agregarCategoriaApi,
     eliminarCategoriaApi,
+    updateAdjudicadoStatusApi,
+    getSubcategoriasByCategoria
   };
 }

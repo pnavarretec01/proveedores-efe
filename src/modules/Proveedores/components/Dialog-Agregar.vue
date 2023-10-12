@@ -7,8 +7,10 @@ const snackbar = ref(false);
 const snackbarColor = ref("succes");
 const snackbarMessage = ref("");
 
-const { agregarEliminarDato, eliminarContactoApi, agregarContactoApi, agregarLicitacionApi, eliminarLicitacionApi, agregarCategoriaApi,
-  eliminarCategoriaApi, } = useProveedor(snackbar, snackbarColor, snackbarMessage);
+const { agregarEliminarDato, eliminarContactoApi, agregarContactoApi, agregarLicitacionApi,
+  eliminarLicitacionApi, agregarCategoriaApi,
+  eliminarCategoriaApi, updateAdjudicadoStatusApi, getSubcategoriasByCategoria
+} = useProveedor(snackbar, snackbarColor, snackbarMessage);
 const emit = defineEmits();
 
 const props = defineProps({
@@ -31,22 +33,71 @@ const props = defineProps({
 });
 const localDialog = ref(props.dialog);
 
-
-
 const internalLicitaciones = ref([...(props.item.licitaciones || [])]);
-const internalCategorias = ref([...(props.item.categoriasProveedor ? props.item.categoriasProveedor.map(cat => cat.Categoria) : [])]);
+const internalCategorias = ref([...(props.item.categoriasProveedor ? props.item.categoriasProveedor.map(cat =>
+  cat.Categoria) : [])]);
 watch(() => props.item.categoriasProveedor, newVal => {
   if (newVal && newVal.length) {
     internalCategorias.value = [...newVal.map(cat => {
+      let subCategoriasWithID = [];
+      if (cat.Categoria.SubCategoriasByCategoria) {
+        subCategoriasWithID = cat.Categoria.SubCategoriasByCategoria.map(subCat => {
+          const catProID = subCat.CategoriasProveedor && subCat.CategoriasProveedor.length > 0
+            ? subCat.CategoriasProveedor[0].CatProID
+            : null;
+
+          return {
+            ...subCat,
+            CatProID: catProID
+          }
+        });
+      }
+
       return {
         ...cat.Categoria,
-        CatProID: cat.CatProID
+        CatProID: cat.CatProID,
+        SubCategoria: cat.SubCategoria,
+        SubCategoriasByCategoria: subCategoriasWithID
       }
     })];
   } else {
     internalCategorias.value = [];
   }
 }, { immediate: true });
+
+
+const agruparCategorias = (data) => {
+  const agrupado = {};
+
+  data.forEach(item => {
+    if (!agrupado[item.CategoriaID]) {
+      agrupado[item.CategoriaID] = {
+        Categoria: item.Categoria,
+        SubCategorias: [],
+        CatProID: item.CatProID
+      };
+    }
+
+    if (item.SubCategoria) {
+      agrupado[item.CategoriaID].SubCategorias.push(item.SubCategoria);
+    }
+  });
+
+  return Object.values(agrupado);
+};
+
+const categoriasProcesadas = ref([]);
+
+watch(() => props.item.categoriasProveedor, newVal => {
+  console.log(newVal);
+  if (newVal && newVal.length) {
+    categoriasProcesadas.value = agruparCategorias(newVal);
+  } else {
+    categoriasProcesadas.value = [];
+  }
+}, { deep: true, immediate: true });
+
+
 
 
 watch(() => props.item.licitaciones, newVal => {
@@ -193,6 +244,18 @@ const categoriasDisponibles = computed(() => {
   );
 });
 
+const updateAdjudicadoStatus = (licitacionProveedor) => {
+  updateAdjudicadoStatusApi(licitacionProveedor.value.LicitacionProveedor.LicProvID,
+    licitacionProveedor.value.LicitacionProveedor.Adjudicado)
+    .then(response => {
+      emit('updateData');
+    })
+    .catch(error => {
+      console.error("Hubo un error al actualizar el estado adjudicado", error);
+    });
+};
+
+
 const categoriaSeleccionada = ref(null);
 
 const agregarCategoria = () => {
@@ -201,6 +264,7 @@ const agregarCategoria = () => {
       if (response.success) {
         const data = response.data;
         categoriasSeleccionadas.value.unshift(data);
+        // props.item.categoriasProveedor.unshift(data)
         emit('updateData');
       }
     }).catch(error => {
@@ -208,18 +272,111 @@ const agregarCategoria = () => {
     });
   }
 };
+const refreshKey = ref(0);
 
-const eliminarCategoria = (CatProID, index) => {
-  const categoria = categoriasSeleccionadas.value[index];
+// En algún método o lugar donde quieras forzar el renderizado:
 
-  eliminarCategoriaApi(CatProID).then(() => {
-    categoriasSeleccionadas.value.splice(index, 1);
-    emit('updateData');
-  }).catch(error => {
-    console.error("Hubo un error al eliminar la categoría", error);
-  });
-  //categoriasSeleccionadas.value.splice(index, 1);
+const eliminarCategoria = (CatProID) => {
+  const index = categoriasSeleccionadas.value.findIndex(cat => cat.CatProID === CatProID);
+
+  if (index !== -1) {
+    const categoria = categoriasSeleccionadas.value[index];
+
+    eliminarCategoriaApi(CatProID).then(() => {
+      categoriasSeleccionadas.value.splice(index, 1);
+      emit('updateData');
+      refreshKey.value++;
+    }).catch(error => {
+      console.error("Hubo un error al eliminar la categoría", error);
+    });
+  } else {
+    console.error("No se pudo encontrar la categoría con CatProID:", CatProID);
+  }
 };
+
+const valorExpanded = ref([]);
+const subCategoriaSeleccioandaPorCategoria = ref([]);
+
+const agregarSubCategoria = async () => {
+  const categoriaID = Object.keys(subCategoriaSeleccioandaPorCategoria.value)[0];
+  const subCategoriaSeleccionada = subCategoriaSeleccioandaPorCategoria.value[categoriaID];
+
+  agregarCategoriaApi(props.item.proveedor.ProveedorID, subCategoriaSeleccionada.CategoriaID,
+    subCategoriaSeleccionada.SubCategoriaID).then(response => {
+      if (response.success) {
+        const data = response.data;
+
+        // Agregar la nueva subcategoría a la lista interna
+        categoriasSeleccionadas.value.push(data);
+
+        emit('updateData');
+        refreshKey.value++;
+      }
+    }).catch(error => {
+      console.error("Hubo un error al guardar la categoría", error);
+    });
+};
+const categoriasAgrupadas = computed(() => {
+  let agrupado = {};
+
+  categoriasSeleccionadas.value.forEach(categoria => {
+    if (!agrupado[categoria.CategoriaID]) {
+      agrupado[categoria.CategoriaID] = {
+        Categoria: categoria.Categoria,
+        SubCategorias: [],
+        SubCategoriasByCategoria: categoria.SubCategoriasByCategoria,
+        CatProID: categoria.CatProID
+      };
+    }
+
+    if (categoria.SubCategoria) {
+      agrupado[categoria.CategoriaID].SubCategorias.push({
+        SubCategoria: categoria.SubCategoria,
+        CatProID: categoria.CatProID
+      });
+    }
+  });
+
+  return Object.values(agrupado);
+});
+
+
+const eliminarSubCategoria = (CatProID) => {
+  const index = categoriasSeleccionadas.value.findIndex(cat => cat.CatProID === CatProID);
+  if (index !== -1) {
+    const subcategoria = categoriasSeleccionadas.value[index];
+
+    eliminarCategoriaApi(CatProID).then(() => {
+      // Eliminar la subcategoría de la lista interna
+      categoriasSeleccionadas.value.splice(index, 1);
+
+      emit('updateData');
+      refreshKey.value++;
+    }).catch(error => {
+      console.error("Hubo un error al eliminar la subcategoría", error);
+    });
+  } else {
+    console.error("No se pudo encontrar la subcategoría con CatProID:", CatProID);
+  }
+};
+
+const subCategoriasDisponibles = computed(() => {
+  if (!categoriaSeleccionada.value) return [];
+  
+  const categoriaActual = props.categoriasCargadas.find(cat => cat.CategoriaID === categoriaSeleccionada.value.CategoriaID);
+  
+  if (!categoriaActual || !categoriaActual.SubCategoriasByCategoria) return [];
+
+  const subCategoriasYaSeleccionadas = categoriasSeleccionadas.value.flatMap(cat => 
+    cat.SubCategoria ? cat.SubCategoria.SubCategoriaID : []
+  );
+
+  return categoriaActual.SubCategoriasByCategoria.filter(subCat => 
+    !subCategoriasYaSeleccionadas.includes(subCat.SubCategoriaID)
+  );
+});
+
+
 </script>
 <template>
   <VDialog v-model="localDialog" width="720" @click:outside="close" style="overflow-y: auto;">
@@ -257,7 +414,7 @@ const eliminarCategoria = (CatProID, index) => {
                 <VTextField v-model="item.proveedor.Direccion" label="Dirección" />
               </VCol>
               <VCol cols="12" sm="12" md="12">
-                <AppTextarea v-model="item.proveedor.Observacion" label="Observación" rows="5"/>
+                <AppTextarea v-model="item.proveedor.Observacion" label="Observación" rows="5" />
               </VCol>
             </VRow>
           </VWindowItem>
@@ -278,9 +435,15 @@ const eliminarCategoria = (CatProID, index) => {
                 </VBtn>
               </VCol>
             </VRow>
-            <VDataTable :items="licitacionesSeleccionadas"
-              :headers="[{ title: 'Licitacion', key: 'Licitacion' }, { title: 'Acciones', key: 'actions', sortable: false }]"
-              class="mt-3" style="max-height: 300px; overflow-y: auto;">
+            <VDataTable :items="licitacionesSeleccionadas" :headers="[{ title: 'Licitacion', key: 'Licitacion' },
+            { title: 'Adjudicado', key: 'adjudicado', sortable: false },
+            { title: 'Acciones', key: 'actions', sortable: false }]" class="mt-3"
+              style="max-height: 300px; overflow-y: auto;">
+              <template v-slot:item.adjudicado="{ item, index }">
+                <v-switch :label="item.value.LicitacionProveedor.Adjudicado ? 'Si' : 'No'"
+                  v-model="item.value.LicitacionProveedor.Adjudicado" inset color="success" hide-details
+                  @input="updateAdjudicadoStatus(item)" />
+              </template>
               <template v-slot:item.actions="{ item, index }">
                 <VBtn small icon color="error" @click="eliminarLicitacion(item, index)">
                   <VIcon>mdi-delete</VIcon>
@@ -335,26 +498,88 @@ const eliminarCategoria = (CatProID, index) => {
                 </VBtn>
               </VCol>
             </VRow>
+            <!-- <VDataTable :items="categoriasProcesadas" :headers="[
+              { title: 'Categoría', key: 'Categoria' },
+              { title: 'SubCategorías', key: 'SubCategorias' },
+              { title: 'Acciones', key: 'actions', sortable: false }
+            ]" class="mt-3" style="max-height: 300px; overflow-y: auto;" :key="refreshKey">
+              <template v-slot:item.Categoria="{ item }">
+                {{ item.value.Categoria.Categoria }}
+              </template>
+              <template v-slot:item.SubCategorias="{ item }">
+                <ul>
+                  <li v-for="sub in item.value.SubCategorias" :key="sub.SubCategoriaID">
+                    {{ sub.SubCategoria }}
+                  </li>
+                </ul>
+              </template>
+              <template v-slot:item.actions="{ item, index }">
+                <VBtn small icon color="error" @click="eliminarCategoria(item.value.CatProID, index)">
+                  <VIcon>mdi-delete</VIcon>
+                </VBtn>
+              </template>
+              <template v-slot:no-data>
+                Sin categorías procesadas.
+              </template>
+            </VDataTable> -->
 
-            <VDataTable :items="categoriasSeleccionadas" :headers="[
+
+            <VDataTable :items="categoriasAgrupadas" :headers="[
               {
                 title: '',
                 key: 'data-table-expand',
               },
               { title: 'Categoría', key: 'Categoria' },
               { title: 'Acciones', key: 'actions', sortable: false }
-            ]" class="mt-3" style="max-height: 300px; overflow-y: auto;" expand-on-click>
+            ]" class="mt-3" style="max-height: 300px; overflow-y: auto;" expand-on-click
+              v-model:expanded="valorExpanded">
               <template #expanded-row="slotProps">
-                <tr>
-                  <td colspan="100%">
-                    <strong>Subcategorias:</strong>
-                    <ul>
-                      <li v-for="sub in slotProps.item.raw.SubCategorias" :key="sub.SubCategoriaID">
-                        {{ sub.SubCategoria }}
-                      </li>
-                    </ul>
-                  </td>
-                </tr>
+
+                <VRow class="mt-1 mb-1">
+                  <VCol cols="12" sm="12" md="10">
+                    {{slotProps.item.value.CatProID}}
+                    <AppAutocomplete item-title="SubCategoria" :items="slotProps.item.value.SubCategoriasByCategoria"
+                      placeholder="SubCategoría" return-object
+                      v-model="subCategoriaSeleccioandaPorCategoria[slotProps.item.value.CatProID]">>
+                      <template v-slot:no-data>
+                        <div class="px-4">No existen datos</div>
+                      </template>
+                    </AppAutocomplete>
+                  </VCol>
+                  <VCol cols="12" sm="12" md="2">
+                    <VBtn small color="primary" class="ml-2" @click="agregarSubCategoria">
+                      +
+                    </VBtn>
+                  </VCol>
+                </VRow>
+                <strong>Sub Categorías: </strong>
+                <VRow v-for="sub in slotProps.item.raw.SubCategorias" :key="sub.SubCategoriaID">
+                  <VCol cols="10">{{ sub.SubCategoria.SubCategoria }}</VCol>
+                  <VCol cols="2">
+                    <IconBtn @click="eliminarSubCategoria(sub.CatProID)" color="error">
+                      <VIcon icon="tabler-trash" />
+                    </IconBtn>
+                  </VCol>
+                </VRow>
+                <!-- <table>
+                  <thead>
+                    <tr>
+                      <th>Subcategoría</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="sub in slotProps.item.raw.SubCategorias" :key="sub.SubCategoriaID">
+                      <td>{{ sub.SubCategoria }}</td>
+                      <td>
+                        <IconBtn @click="eliminarSubCategoria(sub.CatProID)" color="error">
+                          <VIcon icon="tabler-trash" />
+                        </IconBtn>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table> -->
+
               </template>
               <template v-slot:item.actions="{ item, index }">
                 <VBtn small icon color="error" @click="eliminarCategoria(item.value.CatProID, index)">
@@ -368,10 +593,14 @@ const eliminarCategoria = (CatProID, index) => {
           </VWindowItem>
         </VWindow>
       </VCardText>
-      <VCardActions>
+      <VCardActions v-if="currentTab == 0">
         <VSpacer />
         <VBtn color="error" variant="outlined" @click="close">Cancelar</VBtn>
         <VBtn color="success" variant="elevated" @click="guardar">Guardar</VBtn>
+      </VCardActions>
+      <VCardActions v-else>
+        <VSpacer />
+        <VBtn color="error" variant="outlined" @click="close">Cerrar</VBtn>
       </VCardActions>
     </VCard>
     <VSnackbar v-model="snackbar" :color="snackbarColor" location="top end" :timeout="2000">
@@ -379,4 +608,20 @@ const eliminarCategoria = (CatProID, index) => {
     </VSnackbar>
   </VDialog>
 </template>
+<style scoped>
+table {
+  border-collapse: collapse;
+  inline-size: 100%;
+}
+
+th,
+td {
+  padding: 8px;
+  border: 1px solid #ddd;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+</style>
 
