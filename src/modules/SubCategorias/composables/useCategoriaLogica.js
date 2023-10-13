@@ -1,7 +1,7 @@
 import { ref } from "vue";
 
 export const useCategoriaLogica = (
-  data,
+  dataSubCategorias,
   abrirDialog,
   abrirDialogEliminar,
   snackbar,
@@ -33,7 +33,7 @@ export const useCategoriaLogica = (
   }
 
   const servicioExiste = (nombre, excludeId = null) => {
-    return data.value.some((item) => {
+    return dataSubCategorias.value.some((item) => {
       if (excludeId && item.SubCategoriaID === excludeId) {
         return false;
       }

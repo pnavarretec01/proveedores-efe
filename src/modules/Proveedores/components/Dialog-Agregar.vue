@@ -359,24 +359,6 @@ const eliminarSubCategoria = (CatProID) => {
     console.error("No se pudo encontrar la subcategoría con CatProID:", CatProID);
   }
 };
-
-const subCategoriasDisponibles = computed(() => {
-  if (!categoriaSeleccionada.value) return [];
-  
-  const categoriaActual = props.categoriasCargadas.find(cat => cat.CategoriaID === categoriaSeleccionada.value.CategoriaID);
-  
-  if (!categoriaActual || !categoriaActual.SubCategoriasByCategoria) return [];
-
-  const subCategoriasYaSeleccionadas = categoriasSeleccionadas.value.flatMap(cat => 
-    cat.SubCategoria ? cat.SubCategoria.SubCategoriaID : []
-  );
-
-  return categoriaActual.SubCategoriasByCategoria.filter(subCat => 
-    !subCategoriasYaSeleccionadas.includes(subCat.SubCategoriaID)
-  );
-});
-
-
 </script>
 <template>
   <VDialog v-model="localDialog" width="720" @click:outside="close" style="overflow-y: auto;">
