@@ -174,7 +174,7 @@ const eliminarContacto = (index) => {
   }
 };
 
-const guardarContacto = (contacto) => {
+const guardarContacto = (contacto, indexContacto) => {
   agregarContactoApi(props.item.proveedor.ProveedorID, 'contactos', 'POST', contacto).then(response => {
     if (contacto.ContactoID) {
       const index = contactos.value.findIndex(c => c.ContactoID === contacto.ContactoID);
@@ -182,14 +182,19 @@ const guardarContacto = (contacto) => {
         contactos.value[index] = response.data;
       }
     } else {
-      contactos.value.unshift(response.data);
+      contactos.value[indexContacto] = { NombreContacto: "", Email: "", Telefono: "" };
+      contactos.value.splice(indexContacto, 1);
+      contactos.value.push(response.data);
     }
-    contactos.value = [{ NombreContacto: "", Email: "", Telefono: "" }];
+
     emit('updateData');
   }).catch(error => {
     console.error("Hubo un error al guardar el contacto", error);
   });
 };
+
+
+
 
 
 const licitacionSeleccionada = ref(null);
@@ -336,11 +341,6 @@ const agregarSubCategoria = async (slotProps) => {
     });
 };
 
-
-
-
-
-
 const computeAgruparCategorias = (data) => {
   let agrupado = {};
 
@@ -365,7 +365,6 @@ const computeAgruparCategorias = (data) => {
   return Object.values(agrupado);
 };
 
-
 const categoriasAgrupadas = computed(() => computeAgruparCategorias(categoriasSeleccionadas.value));
 watch(
   () => categoriasAgrupadas.value,
@@ -373,24 +372,19 @@ watch(
     //console.log('categoriasAgrupadas ha cambiado');
     // console.log('Valor antiguo: ', oldValue);
     // console.log('Valor nuevo: ', newValue);
-
-    // Aquí puedes añadir el código que quieras ejecutar cuando categoriasAgrupadas cambie
   },
-  { deep: true } // Esta opción es necesaria si quieres observar cambios profundos dentro de un objeto
+  { deep: true }
 );
 
 
 
 const eliminarSubCategoria = (CatProID, subcat, indexTabla, slotProps) => {
-  // Intentar encontrar el índice en slotProps.item.raw.SubCategorias
   let index = slotProps.item.raw.SubCategorias.findIndex(cat => cat.CatProID === CatProID);
   let sourceArray;
 
   if (index !== -1) {
-    // Si lo encuentra en slotProps.item.raw.SubCategorias, usa este array
     sourceArray = slotProps.item.raw.SubCategorias;
   } else {
-    // Si no lo encuentra en slotProps.item.raw.SubCategorias, intenta en categoriasSeleccionadas.value
     index = categoriasSeleccionadas.value.findIndex(cat => cat.CatProID === CatProID);
     if (index !== -1) {
       sourceArray = categoriasSeleccionadas.value;
@@ -527,7 +521,7 @@ const getSubCategoriasDisponibles = (categoriaID, slotProps) => {
                   <VTextField v-model="contacto.Telefono" label="Teléfono" />
                 </VCol>
                 <VCol cols="12" sm="12" md="2">
-                  <VBtn small icon color="success" @click="guardarContacto(contacto)">
+                  <VBtn small icon color="success" @click="guardarContacto(contacto, index)">
                     <VIcon>mdi-content-save</VIcon>
                   </VBtn>
                   <VBtn small icon color="error" @click="eliminarContacto(index)">
