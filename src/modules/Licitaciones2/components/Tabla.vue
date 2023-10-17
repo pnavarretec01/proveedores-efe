@@ -87,15 +87,89 @@ function loadItems(newOptions) {
       loading.value = false;
     });
 }
+
+import * as XLSX from 'xlsx';
+
+
+const fileInput = ref(null);
+
+function triggerFileInput() {
+  if (fileInput.value) {
+    fileInput.value.click();
+  }
+}
+
+
+function handleFileUpload(event) {
+  const file = event.target.files[0];
+
+
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const data = e.target.result;
+    const workbook = XLSX.read(data, { type: 'binary' });
+    const firstSheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[firstSheetName];
+
+    const licitaciones = XLSX.utils.sheet_to_json(worksheet);
+    enviarLicitaciones(licitaciones);
+  };
+  reader.readAsBinaryString(file);
+}
+
+async function enviarLicitaciones(licitaciones) {
+  let exitosas = 0;
+  let fallidas = 0;
+  const failedLicitaciones = ref([]);
+
+  for (let licitacion of licitaciones) {
+    const { __rowNum__, ...licitacionData } = licitacion;
+
+    try {
+      await createItem(licitacionData);
+      exitosas++;
+    } catch (error) {
+      console.error('Error guardando la licitación:', licitacionData, error);
+      fallidas++;
+      failedLicitaciones.value.push(licitacionData.Licitacion);
+    }
+
+  }
+
+  // mensaje de resumen al final
+  if (exitosas > 0) {
+    snackbarMessage.value = `${exitosas} licitación(es) guardada(s) con éxito.`;
+    snackbarColor.value = "success";
+    snackbar.value = true;
+  }
+
+  if (fallidas > 0) {
+    snackbarMessage.value += ` ${fallidas} licitación(es) fallida(s): ${failedLicitaciones.value.join(', ')}.`;
+    snackbarColor.value = "error";
+    snackbar.value = true;
+  }
+
+  fetchItems(filters.value, options.value.page, options.value.itemsPerPage);
+}
 </script>
 
 <template>
   <div>
+
     <div class="me-3 d-flex gap-3 mb-4 mt-1">
       <VBtn prepend-icon="tabler-plus" @click="crearServicio">
         Crear Nueva Licitación
       </VBtn>
     </div>
+    <div class="me-3 d-flex gap-3 mb-4 mt-1">
+      <input type="file" ref="fileInput" @change="handleFileUpload" style="display: none;" />
+      <VBtn prepend-icon="tabler-file-import" @click="triggerFileInput">
+        Importar Licitaciones desde Excel
+      </VBtn>
+    </div>
+
     <!-- <VCardText>
       <VRow>
         <VCol cols="12" offset-md="8" md="4">

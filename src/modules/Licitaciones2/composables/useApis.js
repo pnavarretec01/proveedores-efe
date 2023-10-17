@@ -34,6 +34,7 @@ export function useApis(snackbar, snackbarColor, snackbarMessage) {
   };
 
   const createItem = async (item) => {
+    console.log(item);
     try {
       const response = await axios.post(apiBaseURL + "licitaciones", {
         Licitacion: item.Licitacion
