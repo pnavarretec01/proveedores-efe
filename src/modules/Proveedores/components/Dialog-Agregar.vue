@@ -304,7 +304,6 @@ const agregarSubCategoria = async (slotProps) => {
     snackbar.value = true;
     return
   }
-console.log(props.item.proveedor.ProveedorID);
   agregarCategoriaApi(props.item.proveedor.ProveedorID, subCategoriaSeleccionada.CategoriaID,
     subCategoriaSeleccionada.SubCategoriaID).then(response => {
       if (response.success) {

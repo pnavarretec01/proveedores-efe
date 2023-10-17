@@ -191,7 +191,6 @@ export default function useProveedor(snackbar, snackbarColor, snackbarMessage) {
   const getSubcategoriasByCategoria = async (categoriaID) => {
     try {
         const response = await axios.get(`${baseUrl}subcategorias/byCategoria/${categoriaID}`);
-        console.log(response.data.data);
         return response.data.data;
     } catch (err) {
         snackbarMessage.value = err.response.data.message;
