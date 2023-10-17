@@ -294,9 +294,17 @@ const valorExpanded = ref([]);
 const subCategoriaSeleccioandaPorCategoria = ref([]);
 
 const agregarSubCategoria = async (slotProps) => {
+
   const categoriaID = Object.keys(subCategoriaSeleccioandaPorCategoria.value)[0];
   const subCategoriaSeleccionada = subCategoriaSeleccioandaPorCategoria.value[categoriaID];
 
+  if (!subCategoriaSeleccioandaPorCategoria.value[categoriaID]) {
+    snackbarMessage.value = "Selecciona una Sub Categoría para agregar";
+    snackbarColor.value = "error";
+    snackbar.value = true;
+    return
+  }
+console.log(props.item.proveedor.ProveedorID);
   agregarCategoriaApi(props.item.proveedor.ProveedorID, subCategoriaSeleccionada.CategoriaID,
     subCategoriaSeleccionada.SubCategoriaID).then(response => {
       if (response.success) {
@@ -423,7 +431,7 @@ const subcategoriasDisponibles = computed(() => {
 
 const getSubCategoriasDisponibles = (categoriaID, slotProps) => {
   const categoria = subcategoriasDisponibles.value.find(cat => cat.CategoriaID === categoriaID);
-  
+
   if (!categoria) return [];
 
   const subcategoriasEnSlot = slotProps.item.raw.SubCategorias.map(subCat => subCat.SubCategoria.SubCategoriaID);
@@ -573,8 +581,9 @@ const getSubCategoriasDisponibles = (categoriaID, slotProps) => {
                           </template>
                         </AppAutocomplete> -->
                         <AppAutocomplete class="autocompleteSub" item-title="SubCategoria"
-                          :items="getSubCategoriasDisponibles(slotProps.item.value.CatProID, slotProps)" placeholder="SubCategoría"
-                          return-object v-model="subCategoriaSeleccioandaPorCategoria[slotProps.item.value.CatProID]">
+                          :items="getSubCategoriasDisponibles(slotProps.item.value.CatProID, slotProps)"
+                          placeholder="SubCategoría" return-object
+                          v-model="subCategoriaSeleccioandaPorCategoria[slotProps.item.value.CatProID]">
                           <template v-slot:no-data>
                             <div class="px-4">No existen datos</div>
                           </template>
