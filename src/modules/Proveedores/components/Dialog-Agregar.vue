@@ -319,6 +319,9 @@ const agregarSubCategoria = async (slotProps) => {
 
         // agrego la nueva subcateogira a la tabla visualmente
         slotProps.item.raw.SubCategorias.unshift(formattedSubCategoria);
+        console.log(subCategoriaSeleccioandaPorCategoria.value[categoriaID]);
+        subCategoriaSeleccioandaPorCategoria.value[categoriaID] = []
+
 
         emit('updateData');
       }
