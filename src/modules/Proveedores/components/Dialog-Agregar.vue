@@ -406,41 +406,30 @@ const eliminarSubCategoria = (CatProID, subcat, indexTabla, slotProps) => {
   }
 };
 
+//filtro select subcategorias
+const subcategoriasDisponibles = computed(() => {
+  return categoriasAgrupadas.value.map(categoriaAgrupada => {
+    const subcategoriasYaAgregadas = categoriaAgrupada.SubCategorias.map(subCat => subCat.SubCategoriaID);
+    const subCategoriasDisponibles = categoriaAgrupada.SubCategoriasByCategoria.filter(subCatByCat => {
+      return !subcategoriasYaAgregadas.includes(subCatByCat.SubCategoriaID);
+    });
 
+    return {
+      CategoriaID: categoriaAgrupada.CatProID,
+      SubCategorias: subCategoriasDisponibles
+    };
+  });
+});
 
-// const subcategoriasDisponibles = computed(() => {
-//   return categoriasAgrupadas.value.map(categoriaAgrupada => {
-//     // Obtenemos los IDs de las subcategorías que ya han sido agregadas
-//     const subcategoriasYaAgregadas = categoriaAgrupada.SubCategorias.map(subCat => subCat.SubCategoriaID);
+const getSubCategoriasDisponibles = (categoriaID, slotProps) => {
+  const categoria = subcategoriasDisponibles.value.find(cat => cat.CategoriaID === categoriaID);
+  
+  if (!categoria) return [];
 
-//     // Filtramos las subcategorías que NO están en el array subcategoriasYaAgregadas
-//     const subCategoriasDisponibles = categoriaAgrupada.SubCategoriasByCategoria.filter(subCatByCat => {
-//       return !subcategoriasYaAgregadas.includes(subCatByCat.SubCategoriaID);
-//     });
+  const subcategoriasEnSlot = slotProps.item.raw.SubCategorias.map(subCat => subCat.SubCategoria.SubCategoriaID);
 
-//     return {
-//       CategoriaID: categoriaAgrupada.CatProID,
-//       SubCategorias: subCategoriasDisponibles
-//     };
-//   });
-// });
-
-
-// const getSubCategoriasDisponibles = (categoriaID) => {
-//   const categoria = subcategoriasDisponibles.value.find(cat => cat.CategoriaID === categoriaID);
-//   console.log(categoria)
-//   return categoria ? categoria.SubCategorias : [];
-// };
-
-// <AppAutocomplete class="autocompleteSub" item-title="SubCategoria"
-//   :items="getSubCategoriasDisponibles(slotProps.item.value.CatProID)" placeholder="SubCategoría" return-object
-//   v-model="subCategoriaSeleccioandaPorCategoria[slotProps.item.value.CatProID]">
-//   <template v-slot:no-data>
-//     <div class="px-4">No existen datos</div>
-//   </template>
-// </AppAutocomplete>
-
-
+  return categoria.SubCategorias.filter(subCat => !subcategoriasEnSlot.includes(subCat.SubCategoriaID));
+};
 </script>
 <template>
   <VDialog v-model="localDialog" width="720" @click:outside="close" style="overflow-y: auto;">
@@ -576,9 +565,16 @@ const eliminarSubCategoria = (CatProID, subcat, indexTabla, slotProps) => {
                   <td>
                     <ul class="subcategorias-list">
                       <span class="subcat-actions mt-1">
-                        <AppAutocomplete class="autocompleteSub" item-title="SubCategoria"
+                        <!-- <AppAutocomplete class="autocompleteSub" item-title="SubCategoria"
                           :items="slotProps.item.value.SubCategoriasByCategoria" placeholder="SubCategoría" return-object
                           v-model="subCategoriaSeleccioandaPorCategoria[slotProps.item.value.CatProID]">
+                          <template v-slot:no-data>
+                            <div class="px-4">No existen datos</div>
+                          </template>
+                        </AppAutocomplete> -->
+                        <AppAutocomplete class="autocompleteSub" item-title="SubCategoria"
+                          :items="getSubCategoriasDisponibles(slotProps.item.value.CatProID, slotProps)" placeholder="SubCategoría"
+                          return-object v-model="subCategoriaSeleccioandaPorCategoria[slotProps.item.value.CatProID]">
                           <template v-slot:no-data>
                             <div class="px-4">No existen datos</div>
                           </template>
