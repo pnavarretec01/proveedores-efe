@@ -15,9 +15,6 @@ const abrirDialog = ref(false);
 const abrirDialogEliminar = ref(false);
 const abrirDialogSubCategoria = ref(false);
 const abrirDialogEliminarSubCategoria = ref(false);
-
-
-
 const snackbar = ref(false);
 const snackbarColor = ref("succes");
 const snackbarMessage = ref("");
@@ -60,8 +57,6 @@ const {
   closeDeleteSubCategoria,
   abrirEliminarSubCategoria,
 } = useSubCategoriaLogica(dataSubCategorias, abrirDialogSubCategoria, abrirDialogEliminarSubCategoria, snackbar, snackbarColor, snackbarMessage, createSubCategoriaApi, deleteSubCategoriaApi, editSubCategoriaApi, categoriasData, fetchItems);
-
-
 
 const headers = [
   {
@@ -132,11 +127,10 @@ watch(options, newVal => {
       <template #expanded-row="slotProps">
         <tr class="v-data-table__tr">
           <td>
-            
             <ul class="subcategorias-list">
               <VBtn class="mt-1 mb-1" prepend-icon="tabler-plus"
                 @click="crearSubCategoria(slotProps.item.value.CategoriaID)">Agregar SubCategoría</VBtn>
-                <h3>Subcategorías</h3>
+              <h3>Subcategorías</h3>
 
               <li v-for="(subcat, index) in slotProps.item.raw.SubCategorias" :key="subcat.SubCategoriaID">
                 <span class="subcat-icon">
@@ -152,7 +146,6 @@ watch(options, newVal => {
                   <IconBtn>
                     <VIcon icon="tabler-trash" @click="abrirEliminarSubCategoria(subcat)" />
                   </IconBtn>
-
                 </span>
               </li>
               <li v-if="!slotProps.item.raw.SubCategorias || !slotProps.item.raw.SubCategorias.length">
@@ -241,13 +234,11 @@ watch(options, newVal => {
     </VSnackbar>
   </div>
 </template>
-<style>
-.v-table th .v-data-table-header__content {
-  font-weight: 900 !important;
-}
-
-.v-table th {
-  font-size: 0.9125rem !important;
+<style scoped>
+h3 {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-block-end: 10px;
 }
 
 .subcategorias-list {

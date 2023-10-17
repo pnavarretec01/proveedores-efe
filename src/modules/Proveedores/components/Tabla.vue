@@ -54,18 +54,20 @@ const headers = [
     title: '',
     key: 'data-table-expand',
   },
-  {
-    title: 'ID',
-    key: 'ProveedorID',
-  },
+  // {
+  //   title: 'ID',
+  //   key: 'ProveedorID',
+  //   sortable: false,
+  // },
   {
     title: 'Nombre Proveedor',
     key: 'NombreProveedor',
+    sortable: false,
   },
-  {
-    title: 'Referencia',
-    key: 'Referencia',
-  },
+  // {
+  //   title: 'Referencia',
+  //   key: 'Referencia',
+  // },
   {
     title: 'Cod SAP',
     key: 'CodSap',
@@ -79,6 +81,17 @@ const headers = [
     key: 'licitacionStatus',
     sortable: false,
   },
+  {
+    title: 'Participaciones',
+    key: 'noAdjudicadas',
+    sortable: false,
+  },
+  {
+    title: 'Adjudicadas',
+    key: 'adjudicadas',
+    sortable: false,
+  },
+
   {
     title: 'Acciones',
     key: 'actions',
@@ -119,6 +132,16 @@ function clearFilters() {
     Estado: '',
   };
 }
+function getChipColor(count) {
+  if (count === 0) {
+    return 'error';
+  } else if (count > 0 && count <= 3) {
+    return 'warning';
+  } else {
+    return 'success';
+  }
+}
+
 function loadItems(newOptions) {
   loading.value = true;
   options.value = newOptions;
@@ -172,17 +195,34 @@ function loadItems(newOptions) {
         <tr class="v-data-table__tr">
           <td :colspan="headers.length">
             <p class="my-1">
-              Población: {{ slotProps.item.raw.Poblacion }}
+              <strong>Referencia: </strong> {{ slotProps.item.raw.Referencia }}
             </p>
             <p class="my-1">
-              Calle: {{ slotProps.item.raw.Calle }}
+              <strong>Población: </strong> {{ slotProps.item.raw.Poblacion }}
             </p>
             <p class="my-1">
-              Dirección: {{ slotProps.item.raw.Direccion }}
+              <strong>Calle: </strong> {{ slotProps.item.raw.Calle }}
+            </p>
+            <p class="my-1">
+              <strong>Dirección: </strong> {{ slotProps.item.raw.Direccion }}
             </p>
           </td>
         </tr>
       </template>
+      <template v-slot:item.noAdjudicadas="{ item }">
+        <VChip :color="getChipColor(item.raw.Licitaciones.filter(licit => !licit.LicitacionProveedor.Adjudicado).length)">
+          {{ item.raw.Licitaciones.length}}
+        </VChip>
+      </template>
+
+
+      <template v-slot:item.adjudicadas="{ item }">
+        <VChip :color="getChipColor(item.raw.Licitaciones.filter(licit => licit.LicitacionProveedor.Adjudicado).length)">
+          {{ item.raw.Licitaciones.filter(licit => licit.LicitacionProveedor.Adjudicado).length }}
+        </VChip>
+      </template>
+
+
       <template v-slot:item.licitacionStatus="{ item }">
         <VChip label color="success" v-if="item.value.Estado > 0">
           SI

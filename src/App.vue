@@ -28,3 +28,12 @@ handleSkinChanges()
     </VApp>
   </VLocaleProvider>
 </template>
+<style>
+.v-table th .v-data-table-header__content {
+  font-weight: 900 !important;
+}
+
+.v-table th {
+  font-size: 0.9125rem !important;
+}
+</style>
