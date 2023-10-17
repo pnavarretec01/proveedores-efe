@@ -319,7 +319,6 @@ const agregarSubCategoria = async (slotProps) => {
 
         // agrego la nueva subcateogira a la tabla visualmente
         slotProps.item.raw.SubCategorias.unshift(formattedSubCategoria);
-        console.log(subCategoriaSeleccioandaPorCategoria.value[categoriaID]);
         subCategoriaSeleccioandaPorCategoria.value[categoriaID] = []
 
 
@@ -406,6 +405,41 @@ const eliminarSubCategoria = (CatProID, subcat, indexTabla, slotProps) => {
     console.error("No se pudo encontrar la subcategoría con CatProID:", CatProID);
   }
 };
+
+
+
+// const subcategoriasDisponibles = computed(() => {
+//   return categoriasAgrupadas.value.map(categoriaAgrupada => {
+//     // Obtenemos los IDs de las subcategorías que ya han sido agregadas
+//     const subcategoriasYaAgregadas = categoriaAgrupada.SubCategorias.map(subCat => subCat.SubCategoriaID);
+
+//     // Filtramos las subcategorías que NO están en el array subcategoriasYaAgregadas
+//     const subCategoriasDisponibles = categoriaAgrupada.SubCategoriasByCategoria.filter(subCatByCat => {
+//       return !subcategoriasYaAgregadas.includes(subCatByCat.SubCategoriaID);
+//     });
+
+//     return {
+//       CategoriaID: categoriaAgrupada.CatProID,
+//       SubCategorias: subCategoriasDisponibles
+//     };
+//   });
+// });
+
+
+// const getSubCategoriasDisponibles = (categoriaID) => {
+//   const categoria = subcategoriasDisponibles.value.find(cat => cat.CategoriaID === categoriaID);
+//   console.log(categoria)
+//   return categoria ? categoria.SubCategorias : [];
+// };
+
+// <AppAutocomplete class="autocompleteSub" item-title="SubCategoria"
+//   :items="getSubCategoriasDisponibles(slotProps.item.value.CatProID)" placeholder="SubCategoría" return-object
+//   v-model="subCategoriaSeleccioandaPorCategoria[slotProps.item.value.CatProID]">
+//   <template v-slot:no-data>
+//     <div class="px-4">No existen datos</div>
+//   </template>
+// </AppAutocomplete>
+
 
 </script>
 <template>
@@ -528,30 +562,6 @@ const eliminarSubCategoria = (CatProID, subcat, indexTabla, slotProps) => {
                 </VBtn>
               </VCol>
             </VRow>
-            <!-- <VDataTable :items="categoriasProcesadas" :headers="[
-              { title: 'Categoría', key: 'Categoria' },
-              { title: 'SubCategorías', key: 'SubCategorias' },
-              { title: 'Acciones', key: 'actions', sortable: false }
-            ]" class="mt-3" style="max-height: 300px; overflow-y: auto;" :key="refreshKey">
-              <template v-slot:item.Categoria="{ item }">
-                {{ item.value.Categoria.Categoria }}
-              </template>
-              <template v-slot:item.SubCategorias="{ item }">
-                <ul>
-                  <li v-for="sub in item.value.SubCategorias" :key="sub.SubCategoriaID">
-                    {{ sub.SubCategoria }}
-                  </li>
-                </ul>
-              </template>
-              <template v-slot:item.actions="{ item, index }">
-                <VBtn small icon color="error" @click="eliminarCategoria(item.value.CatProID, index)">
-                  <VIcon>mdi-delete</VIcon>
-                </VBtn>
-              </template>
-              <template v-slot:no-data>
-                Sin categorías procesadas.
-              </template>
-            </VDataTable> -->
             <VDataTable :items="categoriasAgrupadas" :headers="[
               {
                 title: '',
