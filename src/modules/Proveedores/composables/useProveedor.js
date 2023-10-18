@@ -39,7 +39,6 @@ export default function useProveedor(snackbar, snackbarColor, snackbarMessage) {
       snackbarColor.value = "success";
       snackbar.value = true;
       return response.data;
-      return response.data;
     } catch (err) {
       snackbarMessage.value = err.response.data.message;
       snackbarColor.value = "error";
@@ -72,8 +71,6 @@ export default function useProveedor(snackbar, snackbarColor, snackbarMessage) {
       snackbarMessage.value = "Proceso realizado con éxito";
       snackbarColor.value = "success";
       snackbar.value = true;
-      return response.data;
-
       return response.data;
     } catch (err) {
       snackbarMessage.value = err.response.data.message;
@@ -128,7 +125,6 @@ export default function useProveedor(snackbar, snackbarColor, snackbarMessage) {
   };
 
   const updateAdjudicadoStatusApi = async (LicProvID, estado) => {
-
     try {
       const response = await axios.put(
         `${baseUrl}licitacionesProveedor/${LicProvID}/adjudicado`,
@@ -150,17 +146,20 @@ export default function useProveedor(snackbar, snackbarColor, snackbarMessage) {
 
   //categorias proveedor
 
-  const agregarCategoriaApi = async (ProveedorID, CategoriaID, SubCategoriaID) => {
+  const agregarCategoriaApi = async (
+    ProveedorID,
+    CategoriaID,
+    SubCategoriaID
+  ) => {
     try {
       const response = await axios.post(`${baseUrl}categoriasProveedor`, {
         ProveedorID: ProveedorID,
         CategoriaID: CategoriaID,
-        SubCategoriaID: SubCategoriaID
+        SubCategoriaID: SubCategoriaID,
       });
       snackbarMessage.value = "Proceso realizado con éxito";
       snackbarColor.value = "success";
       snackbar.value = true;
-      return response.data;
       return response.data;
     } catch (err) {
       snackbarMessage.value = err.response.data.message;
@@ -179,7 +178,6 @@ export default function useProveedor(snackbar, snackbarColor, snackbarMessage) {
       snackbarColor.value = "success";
       snackbar.value = true;
       return response.data;
-      return response.data;
     } catch (err) {
       snackbarMessage.value = err.response.data.message;
       snackbarColor.value = "error";
@@ -190,16 +188,35 @@ export default function useProveedor(snackbar, snackbarColor, snackbarMessage) {
 
   const getSubcategoriasByCategoria = async (categoriaID) => {
     try {
-        const response = await axios.get(`${baseUrl}subcategorias/byCategoria/${categoriaID}`);
-        return response.data.data;
+      const response = await axios.get(
+        `${baseUrl}subcategorias/byCategoria/${categoriaID}`
+      );
+      return response.data.data;
     } catch (err) {
-        snackbarMessage.value = err.response.data.message;
-        snackbarColor.value = "error";
-        snackbar.value = true;
-        throw err;
+      snackbarMessage.value = err.response.data.message;
+      snackbarColor.value = "error";
+      snackbar.value = true;
+      throw err;
     }
-};
+  };
 
+  const eliminarCategoriaPorCatYProvApi = async (CategoriaID, ProveedorID) => {
+    try {
+      const response = await axios.delete(
+        `${baseUrl}categoriasProveedor/deleteCategoria?CategoriaID=${CategoriaID}&ProveedorID=${ProveedorID}`
+      );
+      
+      snackbarMessage.value = "Proceso realizado con éxito";
+      snackbarColor.value = "success";
+      snackbar.value = true;
+      return response.data;
+    } catch (err) {
+      snackbarMessage.value = err.response.data.message;
+      snackbarColor.value = "error";
+      snackbar.value = true;
+      throw err;
+    }
+  };
 
   return {
     loading,
@@ -212,6 +229,7 @@ export default function useProveedor(snackbar, snackbarColor, snackbarMessage) {
     agregarCategoriaApi,
     eliminarCategoriaApi,
     updateAdjudicadoStatusApi,
-    getSubcategoriasByCategoria
+    getSubcategoriasByCategoria,
+    eliminarCategoriaPorCatYProvApi,
   };
 }

@@ -10,7 +10,7 @@ const refreshKey = ref(0);
 
 const { agregarEliminarDato, eliminarContactoApi, agregarContactoApi, agregarLicitacionApi,
   eliminarLicitacionApi, agregarCategoriaApi,
-  eliminarCategoriaApi, updateAdjudicadoStatusApi, getSubcategoriasByCategoria
+  eliminarCategoriaApi, updateAdjudicadoStatusApi, getSubcategoriasByCategoria, eliminarCategoriaPorCatYProvApi
 } = useProveedor(snackbar, snackbarColor, snackbarMessage);
 const emit = defineEmits();
 
@@ -53,6 +53,7 @@ watch(() => props.item.categoriasProveedor, newVal => {
           }
         });
       }
+      console.log(cat.Categoria);
 
       return {
         ...cat.Categoria,
@@ -256,6 +257,7 @@ const updateAdjudicadoStatus = (licitacionProveedor) => {
 
 
 const categoriaSeleccionada = ref(null);
+const eliminarCatBoton = ref(false)
 
 const agregarCategoria = () => {
   if (categoriaSeleccionada.value) {
@@ -273,29 +275,35 @@ const agregarCategoria = () => {
   }
 };
 
-const eliminarCategoria = (CatProID) => {
-  const index = categoriasSeleccionadas.value.findIndex(cat => cat.CatProID === CatProID);
+const eliminarCategoria = (CatProID, subcat, indexTabla, item) => {
+  const CategoriaID = item.value.CategoriaID;
+  const ProveedorID = props.item.proveedor.ProveedorID;
 
-  if (index !== -1) {
-    const categoria = categoriasSeleccionadas.value[index];
+  eliminarCatBoton.value = true;
 
-    eliminarCategoriaApi(CatProID).then(() => {
-      categoriasSeleccionadas.value.splice(index, 1);
-      emit('updateData');
-      refreshKey.value++;
-    }).catch(error => {
-      console.error("Hubo un error al eliminar la categoría", error);
-    });
-  } else {
-    console.error("No se pudo encontrar la categoría con CatProID:", CatProID);
-  }
+  eliminarCategoriaPorCatYProvApi(CategoriaID, ProveedorID).then(() => {
+
+    const index = categoriasSeleccionadas.value.findIndex(cat => cat.CatProID === CatProID);
+    categoriasSeleccionadas.value.splice(index, 1);
+    // if (index !== -1) {
+    //   categoriasSeleccionadas.value.splice(index, 1);
+    // }
+
+    emit('updateData');
+    eliminarCatBoton.value = false;
+  }).catch(error => {
+    console.error("Hubo un error al eliminar la categoría", error);
+    eliminarCatBoton.value = false;
+  });
 };
+
 
 const valorExpanded = ref([]);
 const subCategoriaSeleccioandaPorCategoria = ref([]);
+const agregarSubCatBoton = ref(false)
 
-const agregarSubCategoria = async (slotProps) => {
-
+const agregarSubCategoria = async (slotProps, cat) => {
+  agregarSubCatBoton.value = true
   const categoriaID = Object.keys(subCategoriaSeleccioandaPorCategoria.value)[0];
   const subCategoriaSeleccionada = subCategoriaSeleccioandaPorCategoria.value[categoriaID];
 
@@ -305,8 +313,8 @@ const agregarSubCategoria = async (slotProps) => {
     snackbar.value = true;
     return
   }
-  agregarCategoriaApi(props.item.proveedor.ProveedorID, subCategoriaSeleccionada.CategoriaID,
-    subCategoriaSeleccionada.SubCategoriaID).then(response => {
+  agregarCategoriaApi(props.item.proveedor.ProveedorID, slotProps.item.raw.CategoriaID,
+    cat.SubCategoriaID).then(response => {
       if (response.success) {
         const data = response.data;
 
@@ -331,8 +339,10 @@ const agregarSubCategoria = async (slotProps) => {
 
 
         emit('updateData');
+        agregarSubCatBoton.value = false
       }
     }).catch(error => {
+      agregarSubCatBoton.value = false
       console.error("Hubo un error al guardar la subcategoría", error);
     });
 };
@@ -343,6 +353,7 @@ const computeAgruparCategorias = (data) => {
   data.forEach(categoria => {
     if (!agrupado[categoria.CategoriaID]) {
       agrupado[categoria.CategoriaID] = {
+        CategoriaID: categoria.CategoriaID,
         Categoria: categoria.Categoria,
         SubCategorias: [],
         SubCategoriasByCategoria: categoria.SubCategoriasByCategoria,
@@ -473,8 +484,6 @@ function truncateLicitacion(item) {
           </VWindowItem>
           <VWindowItem key="1">
             <VRow class="mt-1">
-              <!-- :item-title="(item)=˃`${item.Licitacion}`" -->
-              <!-- `${item.Licitacion.length} ˃ 50 ? ${item.Licitacion.substring(47)} : ${item.Licitacion}` -->
               <VCol cols="12" sm="12" md="10">
                 <AppAutocomplete v-if="licitacionesDisponibles && licitacionesDisponibles.length"
                   :item-title="truncateLicitacion"
@@ -546,9 +555,6 @@ function truncateLicitacion(item) {
                 <AppAutocomplete item-title="Categoria" :items="categoriasDisponibles" placeholder="Seleccionar Categoría"
                   return-object v-model="categoriaSeleccionada" prepend-inner-icon="mdi-magnify" rounded theme="light"
                   variant="solo">
-                  <!-- <template v-slot:item="data">
-                    <div> {{ data.item }}</div>
-                  </template> -->
                   <template v-slot:no-data>
                     <div class="px-4">No existen datos</div>
                   </template>
@@ -574,13 +580,6 @@ function truncateLicitacion(item) {
                   <td>
                     <ul class="subcategorias-list">
                       <span class="subcat-actions mt-1">
-                        <!-- <AppAutocomplete class="autocompleteSub" item-title="SubCategoria"
-                          :items="slotProps.item.value.SubCategoriasByCategoria" placeholder="SubCategoría" return-object
-                          v-model="subCategoriaSeleccioandaPorCategoria[slotProps.item.value.CatProID]">
-                          <template v-slot:no-data>
-                            <div class="px-4">No existen datos</div>
-                          </template>
-                        </AppAutocomplete> -->
                         <AppAutocomplete class="autocompleteSub" item-title="SubCategoria"
                           :items="getSubCategoriasDisponibles(slotProps.item.value.CatProID, slotProps)"
                           placeholder="SubCategoría" return-object
@@ -590,7 +589,9 @@ function truncateLicitacion(item) {
                             <div class="px-4">No existen datos</div>
                           </template>
                         </AppAutocomplete>
-                        <VBtn small color="primary" class="ml-2" @click="agregarSubCategoria(slotProps)">
+                        <VBtn small color="primary" class="ml-2"
+                          @click="agregarSubCategoria(slotProps, subCategoriaSeleccioandaPorCategoria[slotProps.item.value.CatProID])"
+                          :disabled="agregarSubCatBoton">
                           +
                         </VBtn>
                       </span>
@@ -618,7 +619,7 @@ function truncateLicitacion(item) {
               </template>
 
               <template v-slot:item.actions="{ item, index }">
-                <VBtn small icon color="error" @click="eliminarCategoria(item.value.CatProID, subcat, index)">
+                <VBtn small icon color="error" @click="eliminarCategoria(item.value.CatProID, subcat, index, item)">
                   <VIcon>mdi-delete</VIcon>
                 </VBtn>
               </template>
