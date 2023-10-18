@@ -265,6 +265,7 @@ const agregarCategoria = () => {
         const data = response.data;
         //console.log(data);
         categoriasSeleccionadas.value.unshift(data);
+        categoriaSeleccionada.value = null
         // props.item.categoriasProveedor.unshift(data)
         emit('updateData');
       }
@@ -336,7 +337,7 @@ const agregarSubCategoria = async (slotProps, cat) => {
         slotProps.item.raw.SubCategorias.unshift(formattedSubCategoria);
         subCategoriaSeleccioandaPorCategoria.value[categoriaID] = []
 
-
+        subCategoriaSeleccioandaPorCategoria.value = []
         emit('updateData');
         agregarSubCatBoton.value = false
       }
@@ -667,8 +668,6 @@ h3 {
   align-items: center;
   padding: 10px;
   border-block-end: 1px dashed #ddd;
-
-  /* Example of a dashed line */
 }
 
 .subcat-icon {
