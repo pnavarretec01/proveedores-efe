@@ -99,6 +99,22 @@ watch(options, newVal => {
     options.value.itemsPerPage = 1
   }
 });
+function customSearch(value, item) {
+  if (!item || !item.Categoria) {
+    return false;
+  }
+  return String(item.Categoria).toLowerCase().includes(value.toLowerCase());
+}
+
+
+const filteredCategoriasData = computed(() => {
+  if (!search.value) return categoriasData.value;
+  return categoriasData.value.filter(item => {
+    return customSearch(search.value, item);
+  });
+});
+
+
 </script>
 
 <template>
@@ -118,12 +134,14 @@ watch(options, newVal => {
       </VRow>
     </VCardText>
 
-    <VDataTable :headers="headers" :items="categoriasData" :search="search" :items-per-page="5" class="text-no-wrap"
-      @update:options="options = $event" hover sticky expand-on-click fixed-header>
+    <VDataTable :headers="headers" :items="filteredCategoriasData" :custom-filter="customSearch" :items-per-page="5"
+      class="text-no-wrap" @update:options="options = $event" hover sticky expand-on-click fixed-header>
       <template v-slot:item.categorias="{ item }">
         <span>{{ item.value.Categoria }}</span>
         <span> ({{ item.value.SubCategorias.length }})</span>
       </template>
+
+
       <template #expanded-row="slotProps">
         <tr class="v-data-table__tr">
           <td>
@@ -167,60 +185,6 @@ watch(options, newVal => {
         </IconBtn>
       </template>
     </VDataTable>
-    <!-- <VDataTable :headers="headers" :items="data" :search="search" :items-per-page="10" :group-by="groupBy">
-      <template #data-table-group="{ props, item }">
-        <td>
-          <VBtn v-bind="props" variant="text" density="comfortable">
-            <VIcon class="flip-in-rtl" :icon="props.icon" />
-          </VBtn>
-          <span>{{ item.value }}</span>
-          <span>({{ item.items[0].raw.SubCategorias.length }})</span>
-
-          <IconBtn>
-            <VIcon icon="tabler-edit" @click="abrirEditarCategoria(item.items[0])" />
-          </IconBtn>
-          <IconBtn @click="abrirEliminarCategoria(item.items[0].raw)">
-            <VIcon icon="tabler-trash" />
-          </IconBtn>
-        </td>
-      </template>
-      <template #item.Categoria="{ item }">
-        {{ item.raw.Categoria }}
-      </template>
-      <template #item.SubCategorias="{ item }">
-        <td>
-          <VList v-if="item.raw.SubCategorias && item.raw.SubCategorias.length">
-            <VListItem>
-              <template #append>
-                <VBtn prepend-icon="tabler-plus" @click="crearSubCategoria">Agregar SubCategoría</VBtn>
-              </template>
-            </VListItem>
-            <template v-for="(subcat, index) in item.raw.SubCategorias">
-              <VListItem>
-                <VListItemTitle>
-                  {{ subcat.SubCategoria }}
-                </VListItemTitle>
-                <template #append>
-                  <IconBtn>
-                    <VIcon icon="tabler-edit" @click="abrirEditarSubCategoria(subcat)" />
-                  </IconBtn>
-                  <IconBtn>
-                    <VIcon icon="tabler-trash" />
-                  </IconBtn>
-                </template>
-              </VListItem>
-              <VDivider v-if="index !== item.raw.SubCategorias.length - 1" />
-            </template>
-          </VList>
-          <div v-else>
-            No hay subcategorías disponibles.
-          </div>
-        </td>
-      </template>
-      <template v-slot:no-data>
-        No hay datos disponibles.
-      </template>
-    </VDataTable> -->
     <subCategoriasDialog :item="subcategoriaEditar" :dialog="abrirDialogSubCategoria" @close="closeSubCategoria"
       @guardarCategoria="guardarSubCategoria" />
     <subCategoriasDialogEliminar :item="subcategoriaEditar" :dialog="abrirDialogEliminarSubCategoria"
