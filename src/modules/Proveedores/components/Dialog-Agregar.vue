@@ -53,7 +53,6 @@ watch(() => props.item.categoriasProveedor, newVal => {
           }
         });
       }
-      console.log(cat.Categoria);
 
       return {
         ...cat.Categoria,
