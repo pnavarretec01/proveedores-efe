@@ -216,13 +216,17 @@ const agregarLicitacion = () => {
   }
 };
 
+const disabledEliminarLicitacion = ref(false)
 const eliminarLicitacion = (item, index) => {
+  disabledEliminarLicitacion.value = true
   const licitacion = licitacionesSeleccionadas.value[index];
 
   eliminarLicitacionApi(licitacion).then(() => {
+    disabledEliminarLicitacion.value = false
     licitacionesSeleccionadas.value.splice(index, 1);
     emit('updateData');
   }).catch(error => {
+    disabledEliminarLicitacion.value = false
     console.error("Hubo un error al eliminar el contacto", error);
   });
 
@@ -243,13 +247,17 @@ const categoriasDisponibles = computed(() => {
   );
 });
 
+const disabledSwitchLicitacion = ref(false)
 const updateAdjudicadoStatus = (licitacionProveedor) => {
+  disabledSwitchLicitacion.value = true
   updateAdjudicadoStatusApi(licitacionProveedor.value.LicitacionProveedor.LicProvID,
     licitacionProveedor.value.LicitacionProveedor.Adjudicado)
     .then(response => {
+      disabledSwitchLicitacion.value = false
       emit('updateData');
     })
     .catch(error => {
+      disabledSwitchLicitacion.value = false
       console.error("Hubo un error al actualizar el estado adjudicado", error);
     });
 };
@@ -257,9 +265,11 @@ const updateAdjudicadoStatus = (licitacionProveedor) => {
 
 const categoriaSeleccionada = ref(null);
 const eliminarCatBoton = ref(false)
+const agregarCatBoton = ref(false)
 
 const agregarCategoria = () => {
   if (categoriaSeleccionada.value) {
+    agregarCatBoton.value = true    
     agregarCategoriaApi(props.item.proveedor.ProveedorID, categoriaSeleccionada.value.CategoriaID).then(response => {
       if (response.success) {
         const data = response.data;
@@ -268,8 +278,10 @@ const agregarCategoria = () => {
         categoriaSeleccionada.value = null
         // props.item.categoriasProveedor.unshift(data)
         emit('updateData');
+        agregarCatBoton.value = false
       }
     }).catch(error => {
+      agregarCatBoton.value = false
       console.error("Hubo un error al guardar la categoría", error);
     });
   }
@@ -290,10 +302,16 @@ const eliminarCategoria = (CatProID, subcat, indexTabla, item) => {
     // }
 
     emit('updateData');
-    eliminarCatBoton.value = false;
+    setTimeout(() => {
+      eliminarCatBoton.value = false;
+    }, 1000);
+
+
   }).catch(error => {
     console.error("Hubo un error al eliminar la categoría", error);
-    eliminarCatBoton.value = false;
+    setTimeout(() => {
+      eliminarCatBoton.value = false;
+    }, 1000);
   });
 };
 
@@ -509,10 +527,10 @@ function truncateLicitacion(item) {
               <template v-slot:item.adjudicado="{ item, index }">
                 <v-switch :label="item.value.LicitacionProveedor.Adjudicado ? 'Si' : 'No'"
                   v-model="item.value.LicitacionProveedor.Adjudicado" inset color="success" hide-details
-                  @input="updateAdjudicadoStatus(item)" />
+                  @input="updateAdjudicadoStatus(item)" :disabled="disabledSwitchLicitacion"/>
               </template>
               <template v-slot:item.actions="{ item, index }">
-                <VBtn small icon color="error" @click="eliminarLicitacion(item, index)">
+                <VBtn small icon color="error" @click="eliminarLicitacion(item, index)" :disabled="disabledEliminarLicitacion">
                   <VIcon>mdi-delete</VIcon>
                 </VBtn>
               </template>
@@ -561,7 +579,7 @@ function truncateLicitacion(item) {
                 </AppAutocomplete>
               </VCol>
               <VCol cols="12" sm="12" md="2">
-                <VBtn @click="agregarCategoria" small color="primary" class="ml-2">
+                <VBtn @click="agregarCategoria" small color="primary" class="ml-2" :disabled="agregarCatBoton">
                   +
                 </VBtn>
               </VCol>
@@ -619,7 +637,8 @@ function truncateLicitacion(item) {
               </template>
 
               <template v-slot:item.actions="{ item, index }">
-                <VBtn small icon color="error" @click="eliminarCategoria(item.value.CatProID, subcat, index, item)">
+                <VBtn small icon color="error" @click="eliminarCategoria(item.value.CatProID, subcat, index, item)"
+                  :disabled="eliminarCatBoton">
                   <VIcon>mdi-delete</VIcon>
                 </VBtn>
               </template>
