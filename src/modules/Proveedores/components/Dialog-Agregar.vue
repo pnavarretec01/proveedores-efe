@@ -193,10 +193,6 @@ const guardarContacto = (contacto, indexContacto) => {
   });
 };
 
-
-
-
-
 const licitacionSeleccionada = ref(null);
 
 const guardarLicitacion = (licitacion) => {
@@ -431,6 +427,9 @@ const getSubCategoriasDisponibles = (categoriaID, slotProps) => {
 
   return categoria.SubCategorias.filter(subCat => !subcategoriasEnSlot.includes(subCat.SubCategoriaID));
 };
+function truncateLicitacion(item) {
+  return item.Licitacion.length > 45 ? item.Licitacion.substring(0, 45) + '...' : item.Licitacion;
+}
 </script>
 <template>
   <VDialog v-model="localDialog" width="720" @click:outside="close" style="overflow-y: auto;">
@@ -438,7 +437,7 @@ const getSubCategoriasDisponibles = (categoriaID, slotProps) => {
     <VCard :title="item.proveedor && item.proveedor.ProveedorID ? 'Editar Proveedor' : 'Crear Proveedor'">
       <VTabs v-model="currentTab">
         <VTab>Proveedor</VTab>
-        <VTab v-if="item.proveedor && item.proveedor.ProveedorID">Licitaciónes</VTab>
+        <VTab v-if="item.proveedor && item.proveedor.ProveedorID">Licitaciones</VTab>
         <VTab v-if="item.proveedor && item.proveedor.ProveedorID">Contactos</VTab>
         <VTab v-if="item.proveedor && item.proveedor.ProveedorID">Categorías</VTab>
       </VTabs>
@@ -474,10 +473,15 @@ const getSubCategoriasDisponibles = (categoriaID, slotProps) => {
           </VWindowItem>
           <VWindowItem key="1">
             <VRow class="mt-1">
+              <!-- :item-title="(item)=˃`${item.Licitacion}`" -->
+              <!-- `${item.Licitacion.length} ˃ 50 ? ${item.Licitacion.substring(47)} : ${item.Licitacion}` -->
               <VCol cols="12" sm="12" md="10">
-                <AppAutocomplete v-if="licitacionesDisponibles && licitacionesDisponibles.length" item-title="Licitacion"
+                <AppAutocomplete v-if="licitacionesDisponibles && licitacionesDisponibles.length"
+                  :item-title="truncateLicitacion"
+                  :hint="licitacionSeleccionada ? licitacionSeleccionada.Licitacion : 'Selecciona una licitación'"
                   :items="licitacionesDisponibles" placeholder="Seleccionar Licitación" return-object
-                  v-model="licitacionSeleccionada">
+                  v-model="licitacionSeleccionada" prepend-inner-icon="mdi-magnify" rounded theme="light" variant="solo"
+                  center-affix="true" density="compact">
                   <template v-slot:no-data>
                     <div class="px-4">No existen datos</div>
                   </template>
@@ -540,7 +544,11 @@ const getSubCategoriasDisponibles = (categoriaID, slotProps) => {
             <VRow class="mt-1">
               <VCol cols="12" sm="12" md="10">
                 <AppAutocomplete item-title="Categoria" :items="categoriasDisponibles" placeholder="Seleccionar Categoría"
-                  return-object v-model="categoriaSeleccionada">
+                  return-object v-model="categoriaSeleccionada" prepend-inner-icon="mdi-magnify" rounded theme="light"
+                  variant="solo">
+                  <!-- <template v-slot:item="data">
+                    <div> {{ data.item }}</div>
+                  </template> -->
                   <template v-slot:no-data>
                     <div class="px-4">No existen datos</div>
                   </template>
@@ -576,7 +584,8 @@ const getSubCategoriasDisponibles = (categoriaID, slotProps) => {
                         <AppAutocomplete class="autocompleteSub" item-title="SubCategoria"
                           :items="getSubCategoriasDisponibles(slotProps.item.value.CatProID, slotProps)"
                           placeholder="SubCategoría" return-object
-                          v-model="subCategoriaSeleccioandaPorCategoria[slotProps.item.value.CatProID]">
+                          v-model="subCategoriaSeleccioandaPorCategoria[slotProps.item.value.CatProID]"
+                          prepend-inner-icon="mdi-magnify" rounded theme="light" variant="solo">
                           <template v-slot:no-data>
                             <div class="px-4">No existen datos</div>
                           </template>
@@ -688,6 +697,18 @@ td {
 
 th {
   background-color: #f2f2f2;
+}
+
+.truncate-text {
+  overflow: hidden;
+  max-inline-size: 200px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scrollable-text {
+  max-inline-size: 200px;
+  overflow-x: auto;
 }
 </style>
 

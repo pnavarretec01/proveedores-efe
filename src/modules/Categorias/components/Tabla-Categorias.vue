@@ -105,16 +105,12 @@ function customSearch(value, item) {
   }
   return String(item.Categoria).toLowerCase().includes(value.toLowerCase());
 }
-
-
 const filteredCategoriasData = computed(() => {
   if (!search.value) return categoriasData.value;
   return categoriasData.value.filter(item => {
     return customSearch(search.value, item);
   });
 });
-
-
 </script>
 
 <template>
@@ -124,7 +120,6 @@ const filteredCategoriasData = computed(() => {
         Crear Nueva Categoría
       </VBtn>
     </div>
-
     <VCardText>
       <VRow>
         <VCol cols="12" offset-md="8" md="4">
@@ -133,15 +128,12 @@ const filteredCategoriasData = computed(() => {
         </VCol>
       </VRow>
     </VCardText>
-
     <VDataTable :headers="headers" :items="filteredCategoriasData" :custom-filter="customSearch" :items-per-page="5"
       class="text-no-wrap" @update:options="options = $event" hover sticky expand-on-click fixed-header>
       <template v-slot:item.categorias="{ item }">
         <span>{{ item.value.Categoria }}</span>
         <span> ({{ item.value.SubCategorias.length }})</span>
       </template>
-
-
       <template #expanded-row="slotProps">
         <tr class="v-data-table__tr">
           <td>
@@ -162,7 +154,7 @@ const filteredCategoriasData = computed(() => {
                     <VIcon icon="tabler-edit" @click="abrirEditarSubCategoria(subcat)" />
                   </IconBtn>
                   <IconBtn>
-                    <VIcon icon="tabler-trash" @click="abrirEliminarSubCategoria(subcat)" />
+                    <VIcon color="error" icon="tabler-trash" @click="abrirEliminarSubCategoria(subcat)" />
                   </IconBtn>
                 </span>
               </li>
@@ -181,7 +173,7 @@ const filteredCategoriasData = computed(() => {
           <VIcon icon="tabler-edit" @click="abrirEditarCategoria(item)" />
         </IconBtn>
         <IconBtn @click="abrirEliminarCategoria(item.value)">
-          <VIcon icon="tabler-trash" />
+          <VIcon color="error" icon="tabler-trash" />
         </IconBtn>
       </template>
     </VDataTable>

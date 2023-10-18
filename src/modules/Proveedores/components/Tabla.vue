@@ -236,7 +236,7 @@ function loadItems(newOptions) {
           <VIcon icon="tabler-edit" @click="abrirEditarItem(item)" />
         </IconBtn>
         <IconBtn @click="abrirEliminarItem(item.value)">
-          <VIcon icon="tabler-trash" />
+          <VIcon color="error" icon="tabler-trash" />
         </IconBtn>
       </template>
       <template v-slot:no-data>
