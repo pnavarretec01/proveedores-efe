@@ -190,7 +190,7 @@ function loadItems(newOptions) {
       </VCol>
     </VRow>
     <VDataTableServer class="text-no-wrap" :headers="headers" :items="data" :items-length="totalItems" :loading="loading"
-      @update:options="loadItems" :search="search" hover sticky expand-on-click fixed-header>
+      @update:options="loadItems" :search="search" hover sticky fixed-header>
       <template #expanded-row="slotProps">
         <tr class="v-data-table__tr">
           <td :colspan="headers.length">

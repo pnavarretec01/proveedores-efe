@@ -229,7 +229,6 @@ const eliminarLicitacion = (item, index) => {
     disabledEliminarLicitacion.value = false
     console.error("Hubo un error al eliminar el contacto", error);
   });
-
 };
 
 const licitacionesDisponibles = computed(() => {
@@ -239,6 +238,7 @@ const licitacionesDisponibles = computed(() => {
     )
   );
 });
+
 const categoriasDisponibles = computed(() => {
   return props.categoriasCargadas.filter(categoria =>
     !categoriasSeleccionadas.value.some(seleccionada =>
@@ -269,7 +269,7 @@ const agregarCatBoton = ref(false)
 
 const agregarCategoria = () => {
   if (categoriaSeleccionada.value) {
-    agregarCatBoton.value = true    
+    agregarCatBoton.value = true
     agregarCategoriaApi(props.item.proveedor.ProveedorID, categoriaSeleccionada.value.CategoriaID).then(response => {
       if (response.success) {
         const data = response.data;
@@ -527,10 +527,11 @@ function truncateLicitacion(item) {
               <template v-slot:item.adjudicado="{ item, index }">
                 <v-switch :label="item.value.LicitacionProveedor.Adjudicado ? 'Si' : 'No'"
                   v-model="item.value.LicitacionProveedor.Adjudicado" inset color="success" hide-details
-                  @input="updateAdjudicadoStatus(item)" :disabled="disabledSwitchLicitacion"/>
+                  @input="updateAdjudicadoStatus(item)" :disabled="disabledSwitchLicitacion" />
               </template>
               <template v-slot:item.actions="{ item, index }">
-                <VBtn small icon color="error" @click="eliminarLicitacion(item, index)" :disabled="disabledEliminarLicitacion">
+                <VBtn small icon color="error" @click="eliminarLicitacion(item, index)"
+                  :disabled="disabledEliminarLicitacion">
                   <VIcon>mdi-delete</VIcon>
                 </VBtn>
               </template>
@@ -591,7 +592,7 @@ function truncateLicitacion(item) {
               },
               { title: 'Categoría', key: 'Categoria' },
               { title: 'Acciones', key: 'actions', sortable: false }
-            ]" class="mt-3" style="max-height: 300px; overflow-y: auto;" expand-on-click
+            ]" class="mt-3" style="max-height: 300px; overflow-y: auto;" 
               v-model:expanded="valorExpanded">
               <template #expanded-row="slotProps">
                 <tr class="v-data-table__tr">

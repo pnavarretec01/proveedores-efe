@@ -129,7 +129,7 @@ const filteredCategoriasData = computed(() => {
       </VRow>
     </VCardText>
     <VDataTable :headers="headers" :items="filteredCategoriasData" :custom-filter="customSearch" :items-per-page="5"
-      class="text-no-wrap" @update:options="options = $event" hover sticky expand-on-click fixed-header>
+      class="text-no-wrap" @update:options="options = $event" hover sticky fixed-header>
       <template v-slot:item.categorias="{ item }">
         <span>{{ item.value.Categoria }}</span>
         <span> ({{ item.value.SubCategorias.length }})</span>
