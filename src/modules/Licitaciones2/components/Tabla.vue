@@ -5,6 +5,7 @@ import { useLogica } from '../composables/useLogica';
 import serviciosDialog from './Dialog-Agregar.vue'
 import serviciosDialogEliminar from './Dialog-Eliminar.vue'
 import { onMounted } from 'vue';
+import * as XLSX from 'xlsx';
 
 const search = ref('')
 const abrirDialog = ref(false);
@@ -88,9 +89,6 @@ function loadItems(newOptions) {
     });
 }
 
-import * as XLSX from 'xlsx';
-
-
 const fileInput = ref(null);
 
 function triggerFileInput() {
@@ -99,10 +97,8 @@ function triggerFileInput() {
   }
 }
 
-
 function handleFileUpload(event) {
   const file = event.target.files[0];
-
 
   if (!file) return;
 
@@ -117,6 +113,8 @@ function handleFileUpload(event) {
     enviarLicitaciones(licitaciones);
   };
   reader.readAsBinaryString(file);
+
+  event.target.value = '';
 }
 
 async function enviarLicitaciones(licitaciones) {
@@ -135,7 +133,6 @@ async function enviarLicitaciones(licitaciones) {
       fallidas++;
       failedLicitaciones.value.push(licitacionData.Licitacion);
     }
-
   }
 
   // mensaje de resumen al final
@@ -144,7 +141,6 @@ async function enviarLicitaciones(licitaciones) {
     snackbarColor.value = "success";
     snackbar.value = true;
   }
-
   if (fallidas > 0) {
     snackbarMessage.value += ` ${fallidas} licitación(es) fallida(s): ${failedLicitaciones.value.join(', ')}.`;
     snackbarColor.value = "error";
@@ -157,7 +153,6 @@ async function enviarLicitaciones(licitaciones) {
 
 <template>
   <div>
-
     <div class="me-3 d-flex gap-3 mb-4 mt-1">
       <VBtn prepend-icon="tabler-plus" @click="crearServicio">
         Crear Nueva Licitación
@@ -169,7 +164,6 @@ async function enviarLicitaciones(licitaciones) {
         Importar Licitaciones desde Excel
       </VBtn>
     </div>
-
     <!-- <VCardText>
       <VRow>
         <VCol cols="12" offset-md="8" md="4">
@@ -188,8 +182,6 @@ async function enviarLicitaciones(licitaciones) {
         <VBtn @click="clearFilters">Limpiar</VBtn>
       </VCol> -->
     </VRow>
-
-
     <VDataTableServer class="text-no-wrap" :headers="headers" :items="data" :items-length="totalItems" :loading="loading"
       @update:options="loadItems" :search="search" hover sticky>
       <template v-slot:item.actions="{ item }">
