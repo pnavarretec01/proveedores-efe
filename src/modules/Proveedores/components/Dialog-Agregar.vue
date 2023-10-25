@@ -328,7 +328,7 @@ const agregarSubCategoria = async (slotProps, cat) => {
   if (!subCategoriaSeleccioandaPorCategoria.value[categoriaID]) {
     snackbarMessage.value = "Selecciona una Sub Categoría para agregar";
     snackbarColor.value = "error";
-    snackbar.value = true;
+    agregarSubCatBoton.value = false
     return
   }
   agregarCategoriaApi(props.item.proveedor.ProveedorID, slotProps.item.raw.CategoriaID,
@@ -464,13 +464,13 @@ function truncateLicitacion(item) {
   <VDialog v-model="localDialog" width="720" @click:outside="close" style="overflow-y: auto;">
     <DialogCloseBtn @click="close" />
     <VCard :title="item.proveedor && item.proveedor.ProveedorID ? 'Editar Proveedor' : 'Crear Proveedor'">
-      <VTabs v-model="currentTab">
-        <VTab>Proveedor</VTab>
-        <VTab v-if="item.proveedor && item.proveedor.ProveedorID">Licitaciones</VTab>
-        <VTab v-if="item.proveedor && item.proveedor.ProveedorID">Contactos</VTab>
-        <VTab v-if="item.proveedor && item.proveedor.ProveedorID">Categorías</VTab>
-      </VTabs>
       <VCardText>
+        <VTabs v-model="currentTab">
+          <VTab>Proveedor</VTab>
+          <VTab v-if="item.proveedor && item.proveedor.ProveedorID">Licitaciones</VTab>
+          <VTab v-if="item.proveedor && item.proveedor.ProveedorID">Contactos</VTab>
+          <VTab v-if="item.proveedor && item.proveedor.ProveedorID">Categorías</VTab>
+        </VTabs>
         <VWindow v-model="currentTab">
           <VWindowItem key="0">
             <VRow class="mt-1">
@@ -592,8 +592,7 @@ function truncateLicitacion(item) {
               },
               { title: 'Categoría', key: 'Categoria' },
               { title: 'Acciones', key: 'actions', sortable: false }
-            ]" class="mt-3" style="max-height: 300px; overflow-y: auto;" 
-              v-model:expanded="valorExpanded">
+            ]" class="mt-3" style="max-height: 300px; overflow-y: auto;" v-model:expanded="valorExpanded">
               <template #expanded-row="slotProps">
                 <tr class="v-data-table__tr">
                   <td>
