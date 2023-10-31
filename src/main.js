@@ -22,8 +22,6 @@ app.use(createPinia());
 app.use(router);
 app.use(layoutsPlugin);
 
-// Mount vue app
-
 let options = {
   realm: "efe",
   url: "https://sso.efe.cl/auth",
@@ -88,7 +86,7 @@ keycloak
           }
         })
         .catch(() => {
-          console.error("Failed to refresh token");
+         // console.error("Failed to refresh token");
         });
     }, 60000);
 
