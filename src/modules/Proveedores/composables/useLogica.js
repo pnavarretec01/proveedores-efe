@@ -23,6 +23,7 @@ export const useLogica = (
       Direccion: "",
       Estado: 0,
       Observacion: "",
+      Ariba: "",
     },
     licitaciones: [],
     contactos: [],
@@ -71,6 +72,12 @@ export const useLogica = (
     }
     if (!proveedor.Calle) {
       snackbarMessage.value = "Por favor, ingrese una Calle.";
+      snackbarColor.value = "info";
+      snackbar.value = true;
+      return false;
+    }
+    if (!proveedor.Ariba) {
+      snackbarMessage.value = "Por favor, ingrese el código Ariba.";
       snackbarColor.value = "info";
       snackbar.value = true;
       return false;
@@ -140,6 +147,7 @@ export const useLogica = (
         Direccion: item.raw.Direccion,
         Estado: item.raw.Estado,
         Observacion: item.raw.Observacion,
+        Ariba: item.raw.Ariba,
       },
       licitaciones: item.raw.Licitaciones || [],
       contactos: item.raw.Contactos || [],
@@ -160,6 +168,7 @@ export const useLogica = (
         Direccion: "",
         Estado: 0,
         Observacion: "",
+        Ariba: "",
       },
       licitaciones: [],
       contactos: [],
@@ -180,6 +189,7 @@ export const useLogica = (
         Direccion: "",
         Estado: 0,
         Observacion: "",
+        Ariba: "",
       },
       licitaciones: [],
       contactos: [],
@@ -198,6 +208,7 @@ export const useLogica = (
         Direccion: "",
         Estado: 0,
         Observacion: "",
+        Ariba: "",
       },
       licitaciones: [],
       contactos: [],

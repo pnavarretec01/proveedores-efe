@@ -46,6 +46,7 @@ export function useApis(snackbar, snackbarColor, snackbarMessage) {
         Direccion: item.proveedor.Direccion,
         Estado: 0,
         Observacion: item.proveedor.Observacion,
+        Ariba: item.proveedor.Ariba,
         eliminado: 0
       });
       data.value.unshift(response.data.data);

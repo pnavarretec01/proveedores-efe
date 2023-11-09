@@ -40,12 +40,13 @@ const guardar = () => {
       <VCardText>
         <VRow>
           <VCol cols="12" sm="12" md="12">
+            <VTextField v-model="item.Solped" label="Solped" />
+          </VCol>
+          <VCol cols="12" sm="12" md="12">
             <VTextField v-model="item.Licitacion" label="Licitación" />
           </VCol>
-
         </VRow>
       </VCardText>
-
       <VCardActions>
         <VSpacer />
         <VBtn color="error" variant="outlined" @click="close">Cancelar</VBtn>

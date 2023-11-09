@@ -12,12 +12,19 @@ export const useLogica = (
   editItem
 ) => {
   const itemEditar = ref({
+    Solped: "",
     Licitacion: "",
   });
 
   function validateForm(item) {
     if (!item.Licitacion) {
       snackbarMessage.value = "Por favor, ingrese una Licitación.";
+      snackbarColor.value = "info";
+      snackbar.value = true;
+      return false;
+    }
+    if (!item.Solped) {
+      snackbarMessage.value = "Por favor, ingrese Solped.";
       snackbarColor.value = "info";
       snackbar.value = true;
       return false;
@@ -62,6 +69,7 @@ export const useLogica = (
         const item = {
           LicitacionID: itemEditar.value.LicitacionID,
           Licitacion: itemEditar.value.Licitacion,
+          Solped: itemEditar.value.Solped,
         };
         await createItem(item);
       }
@@ -75,6 +83,7 @@ export const useLogica = (
     itemEditar.value = {
       LicitacionID: item.raw.LicitacionID,
       Licitacion: item.raw.Licitacion,
+      Solped: item.raw.Solped,
     };
     abrirDialog.value = true;
   };

@@ -36,7 +36,8 @@ export function useApis(snackbar, snackbarColor, snackbarMessage) {
   const createItem = async (item) => {
     try {
       const response = await axios.post(apiBaseURL + "licitaciones", {
-        Licitacion: item.Licitacion
+        Licitacion: item.Licitacion,
+        Solped: item.Solped
       });
       data.value.unshift(response.data.data);
       snackbarMessage.value = "Elemento creado con éxito";

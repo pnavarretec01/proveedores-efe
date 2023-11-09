@@ -44,6 +44,10 @@ const {
 
 const headers = [
   {
+    title: 'Solped',
+    key: 'Solped',
+  },
+  {
     title: 'Licitación',
     key: 'Licitacion',
   },
@@ -109,7 +113,7 @@ function handleFileUpload(event) {
     const firstSheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[firstSheetName];
 
-    const licitaciones = XLSX.utils.sheet_to_json(worksheet);
+    const licitaciones = XLSX.utils.sheet_to_json(worksheet, { header: ["Solped", "Licitacion",] });
     enviarLicitaciones(licitaciones);
   };
   reader.readAsBinaryString(file);

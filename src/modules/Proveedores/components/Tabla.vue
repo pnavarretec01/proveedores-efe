@@ -72,6 +72,10 @@ const headers = [
     title: 'Cod SAP',
     key: 'CodSap',
   },
+  {
+    title: 'Ariba',
+    key: 'Ariba',
+  },
   // {
   //   title: 'Nro_identificacion',
   //   key: 'NroIdentificacion',
@@ -125,6 +129,7 @@ function clearFilters() {
     NombreProveedor: '',
     Referencia: '',
     CodSap: '',
+    Ariba: '',
     NroIdentificacion: '',
     Poblacion: '',
     Calle: '',
@@ -168,6 +173,9 @@ function loadItems(newOptions) {
       </VCol>
       <VCol cols="12" sm="6" md="2">
         <VTextField v-model="filters.CodSap" label="Cod Sap" outlined />
+      </VCol>
+      <VCol cols="12" sm="6" md="2">
+        <VTextField v-model="filters.Ariba" label="Ariba" outlined />
       </VCol>
       <VCol cols="12" sm="6" md="2">
         <VTextField v-model="filters.NroIdentificacion" label="Nro Identificación" outlined />

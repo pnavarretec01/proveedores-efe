@@ -484,6 +484,9 @@ function truncateLicitacion(item) {
                 <VTextField v-model="item.proveedor.CodSap" label="Código SAP" />
               </VCol>
               <VCol cols="12" sm="6" md="6">
+                <VTextField v-model="item.proveedor.Ariba" label="Código Ariba" />
+              </VCol>
+              <VCol cols="12" sm="6" md="6">
                 <VTextField v-model="item.proveedor.NroIdentificacion" label="N° Identificación" />
               </VCol>
               <VCol cols="12" sm="6" md="6">
