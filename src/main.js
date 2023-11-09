@@ -7,9 +7,9 @@ import { loadFonts } from "@/plugins/webfontloader";
 import router from "@/router";
 import "@core/scss/template/index.scss";
 import "@styles/styles.scss";
+import axios from "axios";
 import { createPinia } from "pinia";
 import { createApp } from "vue";
-import axios from "axios";
 
 loadFonts();
 
@@ -24,7 +24,7 @@ app.use(layoutsPlugin);
 
 let options = {
   realm: "efe",
-  url: "https://sso.efe.cl/auth",
+  url: "172.30.100.201:28080/auth",
   clientId: "web_proveedores",
 };
 
