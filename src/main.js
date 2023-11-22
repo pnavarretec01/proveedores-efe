@@ -72,7 +72,7 @@ keycloak
         .updateToken(70)
         .then((refreshed) => {
           if (refreshed) {
-            console.log("Token refreshed");
+            // console.log("Token refreshed");
           } else {
             // console.log(
             //   "Token not refreshed, valid for",
@@ -137,5 +137,5 @@ keycloak
     app.mount("#app");
   })
   .catch((err) => {
-    console.log("Err", err);
+    // console.log("Err", err);
   });

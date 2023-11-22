@@ -64,24 +64,24 @@ export const useLogica = (
       snackbar.value = true;
       return false;
     }
-    if (!proveedor.Poblacion) {
-      snackbarMessage.value = "Por favor, ingrese una Población.";
-      snackbarColor.value = "info";
-      snackbar.value = true;
-      return false;
-    }
+    // if (!proveedor.Poblacion) {
+    //   snackbarMessage.value = "Por favor, ingrese una Población.";
+    //   snackbarColor.value = "info";
+    //   snackbar.value = true;
+    //   return false;
+    // }
     if (!proveedor.Calle) {
       snackbarMessage.value = "Por favor, ingrese una Calle.";
       snackbarColor.value = "info";
       snackbar.value = true;
       return false;
     }
-    if (!proveedor.Ariba) {
-      snackbarMessage.value = "Por favor, ingrese el código Ariba.";
-      snackbarColor.value = "info";
-      snackbar.value = true;
-      return false;
-    }
+    // if (!proveedor.Ariba) {
+    //   snackbarMessage.value = "Por favor, ingrese el código Ariba.";
+    //   snackbarColor.value = "info";
+    //   snackbar.value = true;
+    //   return false;
+    // }
 
     return true;
   }
