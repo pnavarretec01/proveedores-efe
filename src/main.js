@@ -24,7 +24,7 @@ app.use(layoutsPlugin);
 
 let options = {
   realm: "efe",
-  url: "http://172.30.100.201:28080/auth",
+  url: "https://sso.efe.cl/auth",
   clientId: "web_proveedores",
 };
 
