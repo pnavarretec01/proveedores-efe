@@ -74,36 +74,27 @@ keycloak
           if (refreshed) {
             // console.log("Token refreshed");
           } else {
-            // console.log(
-            //   "Token not refreshed, valid for",
-            //   Math.round(
-            //     keycloak.tokenParsed.exp +
-            //       keycloak.timeSkew -
-            //       new Date().getTime() / 1000
-            //   ),
-            //   "seconds"
-            // );
           }
         })
         .catch(() => {
-         // console.error("Failed to refresh token");
+          // console.error("Failed to refresh token");
         });
     }, 60000);
 
     // Interceptor para manejar 401 y refrescar el token
     axios.interceptors.response.use(
-      (response) => {
-        return response;
-      },
-      (error) => {
+      (response) => response,
+      async (error) => {
         const originalRequest = error.config;
-        if (error.response.status === 401 && !originalRequest._retry) {
+        if (error.response?.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true;
-          return keycloak.updateToken(30).then(() => {
-            originalRequest.headers["Authorization"] =
-              "Bearer " + keycloak.token;
+          try {
+            await keycloakInstance.updateToken(30);
+            originalRequest.headers.Authorization = `Bearer ${keycloakInstance.token}`;
             return axios(originalRequest);
-          });
+          } catch (e) {
+            //console.log("Error al refrescar el token", e);
+          }
         }
         return Promise.reject(error);
       }
