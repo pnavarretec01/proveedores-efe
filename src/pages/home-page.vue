@@ -12,6 +12,7 @@
         excepteur fugiat reprehenderit amet ex ea enim eu esse culpa sunt exercitation laboris. Minim voluptate esse sunt
         minim cillum commodo pariatur ut excepteur minim. Consectetur consectetur anim quis laborum. Aliqua est proident
         amet laboris enim do minim aliqua..
-    </VCardText>
-  </VCard>
-</div></template>
+      </VCardText>
+    </VCard>
+  </div>
+</template>
